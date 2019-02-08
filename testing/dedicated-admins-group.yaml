@@ -1,0 +1,7 @@
+apiVersion: user.openshift.io/v1
+kind: Group
+metadata:
+  name: dedicated-admins
+users:
+- rogbas@redhat.com
+- xyz-test@redhat.com

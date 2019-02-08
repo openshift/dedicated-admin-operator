@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  project_blacklist: kube-.*,openshift-.*,logging,default,openshift,dedicated-admin
+metadata:
+  name: dedicated-admin-operator-config
+  namespace: dedicated-admin

@@ -1,0 +1,19 @@
+apiVersion: authorization.openshift.io/v1
+kind: ClusterRole
+metadata:
+  name: dedicated-project-admin
+rules:
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - limitranges
+  - resourcequotas
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
