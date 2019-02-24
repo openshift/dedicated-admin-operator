@@ -6,37 +6,21 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - pods
-  - services
-  - endpoints
-  - persistentvolumeclaims
-  - events
   - configmaps
-  - secrets
   verbs:
-  - "*"
+  - "get"
+  - "list"
+  - "watch"
 - apiGroups:
   - ""
   resources:
   - namespaces
   verbs:
-  - "*"
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  - daemonsets
-  - replicasets
-  - statefulsets
-  verbs:
-  - "*"
+  - "get"
+  - "list"
+  - "watch"
 - apiGroups:
   - monitoring.coreos.com
-  resources:
-  - servicemonitors
-  verbs:
-  - "get"
-  - "create"
 - apiGroups:
   - rbac.authorization.k8s.io
   attributeRestrictions: null
@@ -44,12 +28,7 @@ rules:
   - clusterrolebindings
   - rolebindings
   verbs:
-  - "*"
-- apiGroups:
-  - ""
-  attributeRestrictions: null
-  resources:
-  - limitranges
-  - resourcequotas
-  verbs:
-  - "*"
+  - "get"
+  - "list"
+  - "watch"
+  - "create"

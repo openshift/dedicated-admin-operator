@@ -25,7 +25,6 @@ import (
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
-	"github.com/operator-framework/operator-sdk/pkg/metrics"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/rogbas/dedicated-admin-operator/pkg/apis"
 	"github.com/rogbas/dedicated-admin-operator/pkg/controller"
@@ -37,11 +36,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/runtime/signals"
 )
 
-// Change below variables to serve metrics on different host or port.
-var (
-	metricsHost       = "0.0.0.0"
-	metricsPort int32 = 8383
-)
 var log = logf.Log.WithName("cmd")
 
 func printVersion() {
@@ -89,8 +83,8 @@ func main() {
 
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
-		Namespace:          namespace,
-		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
+		Namespace: namespace,
+		// MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
 	})
 	if err != nil {
 		log.Error(err, "")
@@ -109,12 +103,6 @@ func main() {
 	if err := controller.AddToManager(mgr); err != nil {
 		log.Error(err, "")
 		os.Exit(1)
-	}
-
-	// Create Service object to expose the metrics port.
-	_, err = metrics.ExposeMetricsPort(ctx, metricsPort)
-	if err != nil {
-		log.Info(err.Error())
 	}
 
 	log.Info("Starting the Cmd.")

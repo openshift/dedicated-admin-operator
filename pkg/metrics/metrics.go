@@ -15,6 +15,8 @@
 package metrics
 
 import (
+	"net/http"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -28,6 +30,14 @@ var (
 		Help: "Report how many namespaces have been blacklisted and did not receive the rolebinding",
 	}, []string{"name"})
 )
+
+// StartMetrics register metrics and exposes them
+func StartMetrics() {
+	// Register metrics and start serving them on /metrics endpoint
+	RegisterMetrics()
+	http.Handle("/metrics", prometheus.Handler())
+	go http.ListenAndServe(MetricsEndpoint, nil)
+}
 
 // RegisterMetrics for the operator
 func RegisterMetrics() error {

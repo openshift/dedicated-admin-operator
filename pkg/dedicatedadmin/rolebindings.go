@@ -12,13 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package controller
+package dedicatedadmin
 
 import (
-	"github.com/rogbas/dedicated-admin-operator/pkg/controller/dedicatedadmin"
+	rbacv1 "k8s.io/api/rbac/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func init() {
-	// AddToManagerFuncs is a list of functions to create controllers and add them to a manager.
-	AddToManagerFuncs = append(AddToManagerFuncs, dedicatedadmin.Add)
+var Rolebindings = map[string]rbacv1.RoleBinding{
+	"dedicated-project-admin": {
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "dedicated-project-admin",
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "dedicated-admins",
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     "dedicated-project-admin",
+		},
+	},
 }

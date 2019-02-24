@@ -12,21 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dedicatedadmin
+package namespace
 
 import (
 	"context"
-	"net/http"
-	"regexp"
-	"strings"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rogbas/dedicated-admin-operator/config"
+	"github.com/rogbas/dedicated-admin-operator/pkg/dedicatedadmin"
 	"github.com/rogbas/dedicated-admin-operator/pkg/metrics"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -36,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-var log = logf.Log.WithName("dedicated-admin-namespace-controller")
+var log = logf.Log.WithName("namespace-controller")
 
 // Add creates a new Project Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -57,7 +52,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	startMetrics()
+	metrics.StartMetrics()
 
 	// Watch for changes to primary resource Project
 	err = c.Watch(&source.Kind{Type: &corev1.Namespace{}}, &handler.EnqueueRequestForObject{})
@@ -69,41 +64,6 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 }
 
 var _ reconcile.Reconciler = &ReconcileNamespace{}
-
-// startMetrics register metrics and exposes them
-func startMetrics() {
-	// Register metrics and start serving them on /metrics endpoint
-	metrics.RegisterMetrics()
-	http.Handle("/metrics", prometheus.Handler())
-	go http.ListenAndServe(metrics.MetricsEndpoint, nil)
-}
-
-// isBlackListedNamespace matchs a nam,espace against the blacklist
-func isBlackListedNamespace(namespace string, blacklistedNamespaces string) bool {
-	for _, blackListedNS := range strings.Split(blacklistedNamespaces, ",") {
-		matched, _ := regexp.MatchString(blackListedNS, namespace)
-		if matched {
-			return true
-		}
-	}
-	return false
-}
-
-// getOperatorConfig gets the operator's configuration from a config map
-func (r *ReconcileNamespace) getOperatorConfig(ctx context.Context) (*corev1.ConfigMap, error) {
-	// TODO - transfer this function to osd-operator-lib
-	var configMap types.NamespacedName
-
-	// TODO - transfer CM name and namespace to separate configuration file
-	configMap.Name = config.OperatorConfigMapName
-	configMap.Namespace = config.OperatorNamespace
-
-	// Load config map with operator's config
-	operatorConfig := &corev1.ConfigMap{}
-	err := r.client.Get(ctx, configMap, operatorConfig)
-
-	return operatorConfig, err
-}
 
 // ReconcileNamespace reconciles a Project object
 type ReconcileNamespace struct {
@@ -118,20 +78,21 @@ type ReconcileNamespace struct {
 func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	ctx := context.Background()
 
+	return reconcile.Result{}, nil
 	// Initialize logging object
 	reqLogger := log.WithValues("Request.Namespace", request.Name)
 
 	// Get operator configuration
-	operatorConfig, err := r.getOperatorConfig(ctx)
+	operatorConfig, err := dedicatedadmin.GetOperatorConfig(ctx, r.client)
 	if err != nil {
-		reqLogger.Info("Error Loading Operator Config")
+		reqLogger.Info("Error Loading Operator Config", "Error", err)
 	}
 
 	// reqLogger.Info("Loaded operator config", "config", operatorConfig.Data)
 
 	// Check if the namespace is black listed - administrative namespaces where we
 	// don't want to add the dedicated-admin rolebinding, e. g kube-system, openshift-logging
-	if isBlackListedNamespace(request.Name, operatorConfig.Data["project_blacklist"]) {
+	if dedicatedadmin.IsBlackListedNamespace(request.Name, operatorConfig.Data["project_blacklist"]) {
 		reqLogger.Info("Blacklisted Namespace - Skipping")
 
 		// Increment counter on prometheus
@@ -161,8 +122,8 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 	}
 
 	// Loop thru our map of rolebindings, adding each one to the namespace
-	for _, rb := range desiredRolebindings {
-		reqLogger.Info("Assigning RoleBinding to Namespace", "ClusterRoleBinding", rb.Name)
+	for _, rb := range dedicatedadmin.Rolebindings {
+		reqLogger.Info("Assigning RoleBinding to Namespace", "RoleBinding", rb.Name)
 
 		// Add namespace parameter to rolebinding
 		rb.Namespace = request.Name
@@ -170,7 +131,7 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		err = r.client.Create(ctx, &rb)
 		// check for errors, but ignore when rolebinding already exists
 		if err != nil && !errors.IsAlreadyExists(err) {
-			reqLogger.Info("Error creating rolebinding", "ClusterRoleBinding", rb.Name, "Error", err)
+			reqLogger.Info("Error creating rolebinding", "RoleBinding", rb.Name, "Error", err)
 		}
 	}
 
