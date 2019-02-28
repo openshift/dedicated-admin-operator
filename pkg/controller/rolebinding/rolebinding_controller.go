@@ -1,3 +1,17 @@
+// Copyright 2018 RedHat
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package rolebinding
 
 import (
@@ -26,7 +40,12 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileRolebinding{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	k8sClient := mgr.GetClient()
+	// Need to pre-load the config ConfigMap to avoid locking/caching issues when
+	// 2 or more controllers start simultaneaously and try to load the same object
+	dedicatedadmin.GetOperatorConfig(context.Background(), k8sClient)
+
+	return &ReconcileRolebinding{client: k8sClient, scheme: mgr.GetScheme()}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -37,7 +56,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// Watch for changes to primary resource Rolebinding
+	// Watch for changes in RoleBindings
 	err = c.Watch(&source.Kind{Type: &rbacv1.RoleBinding{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
@@ -56,13 +75,7 @@ type ReconcileRolebinding struct {
 	scheme *runtime.Scheme
 }
 
-// Reconcile reads that state of the cluster for a Rolebinding object and makes changes based on the state read
-// and what is in the Rolebinding.Spec
-// TODO(user): Modify this Reconcile function to implement your Controller logic.  This example creates
-// a Pod as an example
-// Note:
-// The Controller will requeue the Request to be processed again if the returned error is non-nil or
-// Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
+// Reconcile watches RoleBindings to
 func (r *ReconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	ctx := context.Background()
 
@@ -81,8 +94,6 @@ func (r *ReconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 		return reconcile.Result{}, nil
 	}
 
-	reqLogger.Info("Reconciling Rolebinding")
-
 	// Fetch the RoleBinding instance
 	rb := &rbacv1.RoleBinding{}
 	err = r.client.Get(ctx, request.NamespacedName, rb)
@@ -93,12 +104,13 @@ func (r *ReconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 			// Check if the RB being deleted is from Dedicated Admin
 			missingRB, isDedicatedAdminRB := dedicatedadmin.Rolebindings[request.Name]
 			if isDedicatedAdminRB {
-				reqLogger.Info("Restoring RoleBinding")
+				reqLogger.Info("Restoring RoleBinding", "Namespace", request.Namespace)
 
 				missingRB.Namespace = request.Namespace
 				err = r.client.Create(ctx, &missingRB)
 				if err != nil {
 					reqLogger.Info("Error creating rolebinding", "RoleBinding", missingRB.Name, "Error", err)
+					return reconcile.Result{}, err
 				}
 			}
 

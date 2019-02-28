@@ -25,9 +25,9 @@ const (
 )
 
 var (
-	metricBlacklistedCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "dedicated_admin_blacklisted",
-		Help: "Report how many namespaces have been blacklisted and did not receive the rolebinding",
+	metricBlacklistedGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "dedicated_admin_blacklisted_projects",
+		Help: "Report how many namespaces have been blacklisted for dedicated-admin-operator",
 	}, []string{"name"})
 )
 
@@ -41,12 +41,22 @@ func StartMetrics() {
 
 // RegisterMetrics for the operator
 func RegisterMetrics() error {
-	err := prometheus.Register(metricBlacklistedCounter)
+	err := prometheus.Register(metricBlacklistedGauge)
 
 	return err
 }
 
-// IncBlacklistedCount increments the counter for black listed namespaces
-func IncBlacklistedCount() {
-	metricBlacklistedCounter.With(prometheus.Labels{"name": "dedicated-admin-operator"}).Inc()
+// IncEventGauge will increment a gauge and set appropriate labels.
+func incEventGauge(gauge *prometheus.GaugeVec) {
+	gauge.With(prometheus.Labels{"name": "dedicated-admin-operator"}).Inc()
+}
+
+// UpdateBlacklistedGauge sets the gauge metric with the number of blacklisted projects
+func UpdateBlacklistedGauge(blacklistedProjects map[string]bool) {
+	metricBlacklistedGauge.Reset()
+	for _, isBlacklisted := range blacklistedProjects {
+		if isBlacklisted {
+			incEventGauge(metricBlacklistedGauge)
+		}
+	}
 }

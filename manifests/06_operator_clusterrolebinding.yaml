@@ -5,7 +5,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: dedicated-admin-operator
-  namespace: dedicated-admin
+  namespace: openshift-dedicated-admin
 roleRef:
   kind: ClusterRole
   name: dedicated-admin-operator

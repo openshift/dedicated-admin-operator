@@ -32,6 +32,7 @@ import (
 )
 
 var log = logf.Log.WithName("namespace-controller")
+var blacklistedProjects = make(map[string]bool)
 
 // Add creates a new Project Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -41,13 +42,18 @@ func Add(mgr manager.Manager) error {
 
 // newReconciler returns a new reconcile.Reconciler
 func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileNamespace{client: mgr.GetClient(), scheme: mgr.GetScheme()}
+	k8sClient := mgr.GetClient()
+	// Need to pre-load the config ConfigMap to avoid locking/caching issues when
+	// 2 or more controllers start simultaneaously and try to load the same object
+	dedicatedadmin.GetOperatorConfig(context.Background(), k8sClient)
+
+	return &ReconcileNamespace{client: k8sClient, scheme: mgr.GetScheme()}
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
 func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Create a new controller
-	c, err := controller.New("dedicated-admin-namespace-controller", mgr, controller.Options{Reconciler: r})
+	c, err := controller.New("namespace-controller", mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}
@@ -78,7 +84,6 @@ type ReconcileNamespace struct {
 func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	ctx := context.Background()
 
-	return reconcile.Result{}, nil
 	// Initialize logging object
 	reqLogger := log.WithValues("Request.Namespace", request.Name)
 
@@ -88,17 +93,19 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		reqLogger.Info("Error Loading Operator Config", "Error", err)
 	}
 
-	// reqLogger.Info("Loaded operator config", "config", operatorConfig.Data)
-
 	// Check if the namespace is black listed - administrative namespaces where we
 	// don't want to add the dedicated-admin rolebinding, e. g kube-system, openshift-logging
 	if dedicatedadmin.IsBlackListedNamespace(request.Name, operatorConfig.Data["project_blacklist"]) {
 		reqLogger.Info("Blacklisted Namespace - Skipping")
 
+		// Keep track of blacklisted namespace for gauge metric
+		blacklistedProjects[request.Name] = true
 		// Increment counter on prometheus
-		metrics.IncBlacklistedCount()
+		metrics.UpdateBlacklistedGauge(blacklistedProjects)
 
 		return reconcile.Result{}, nil
+	} else {
+		blacklistedProjects[request.Name] = false
 	}
 
 	// Get the Namespace instance
@@ -115,9 +122,13 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		reqLogger.Info("Error Getting Namespace")
 		return reconcile.Result{}, err
 	}
-	// Namespace is being deleted, return and retry the reconcile loop
+	// Namespace is being deleted, refresh metric and return
 	if ns.Status.Phase == corev1.NamespaceTerminating {
 		reqLogger.Info("Namespace Being Deleted")
+
+		delete(blacklistedProjects, request.Name)
+		metrics.UpdateBlacklistedGauge(blacklistedProjects)
+
 		return reconcile.Result{}, nil
 	}
 
@@ -132,6 +143,7 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		// check for errors, but ignore when rolebinding already exists
 		if err != nil && !errors.IsAlreadyExists(err) {
 			reqLogger.Info("Error creating rolebinding", "RoleBinding", rb.Name, "Error", err)
+			return reconcile.Result{}, err
 		}
 	}
 

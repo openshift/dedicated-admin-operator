@@ -16,5 +16,5 @@ package config
 
 const (
 	OperatorConfigMapName string = "dedicated-admin-operator-config"
-	OperatorNamespace     string = "dedicated-admin"
+	OperatorNamespace     string = "openshift-dedicated-admin"
 )

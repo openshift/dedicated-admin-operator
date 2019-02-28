@@ -44,12 +44,12 @@ func IsBlackListedNamespace(namespace string, blacklistedNamespaces string) bool
 
 // GetOperatorConfig gets the operator's configuration from a config map
 func GetOperatorConfig(ctx context.Context, k8sClient client.Client) (*corev1.ConfigMap, error) {
-	// TODO - transfer this function to osd-operator-lib
 	var configMap types.NamespacedName
 
 	configMap.Name = config.OperatorConfigMapName
 	configMap.Namespace = config.OperatorNamespace
-	daLogger.Info("GetOperatorConfig", "ConfigMap Get Request", configMap)
+	// daLogger.Info("GetOperatorConfig", "ConfigMap Get Request", configMap)
+
 	// Load config map with operator's config
 	operatorConfig := &corev1.ConfigMap{}
 	err := k8sClient.Get(ctx, configMap, operatorConfig)

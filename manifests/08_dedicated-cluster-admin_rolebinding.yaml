@@ -11,4 +11,4 @@ subjects:
 - kind: Group
   name: dedicated-admins
 - kind: SystemGroup
-  name: system:serviceaccounts:dedicated-admin
+  name: system:serviceaccounts:openshift-dedicated-admin
