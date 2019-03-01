@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+      k8s-app: dedicated-admin-operator
+  name: dedicated-admin-operator
+spec:
+  endpoints:
+  - port: metrics
+    scheme: http
+    interval: 30s
+  selector:
+    matchLabels:
+      k8s-app: dedicated-admin-operator
+

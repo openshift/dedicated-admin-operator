@@ -1,0 +1,14 @@
+apiVersion: authorization.openshift.io/v1
+groupNames:
+- dedicated-readers
+- system:serviceaccounts:dedicated-reader
+kind: ClusterRoleBinding
+metadata:
+  name: dedicated-cluster-reader
+roleRef:
+  name: dedicated-cluster-reader
+subjects:
+- kind: Group
+  name: dedicated-readers
+- kind: SystemGroup
+  name: system:serviceaccounts:dedicated-reader
