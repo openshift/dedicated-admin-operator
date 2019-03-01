@@ -1,4 +1,4 @@
-apiVersion: operatorstatus.openshift.io
+apiVersion: operatorstatus.openshift.io/v1
 kind: ClusterOperator
 metadata:
   namespace: openshift-dedicated-admin  
