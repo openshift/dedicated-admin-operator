@@ -15,7 +15,7 @@ spec:
       serviceAccountName: dedicated-admin-operator
       containers:
         - name: dedicated-admin-operator
-          image: quay.io/rogbas/dedicated-admin-operator:latest
+          image: quay.io/redhat/dedicated-admin-operator:latest
           ports:
           - containerPort: 60000
             name: metrics
