@@ -4,6 +4,7 @@ metadata:
   labels:
       k8s-app: dedicated-admin-operator
   name: dedicated-admin-operator
+  namespace: openshift-dedicated-admin
 spec:
   endpoints:
   - port: metrics

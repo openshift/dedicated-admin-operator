@@ -1,7 +1,7 @@
 apiVersion: authorization.openshift.io/v1
 groupNames:
 - dedicated-admins
-- system:serviceaccounts:dedicated-admin
+- system:serviceaccounts:openshift-dedicated-admin
 kind: ClusterRoleBinding
 metadata:
   name: dedicated-cluster-admin
