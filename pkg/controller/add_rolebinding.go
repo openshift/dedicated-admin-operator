@@ -15,7 +15,7 @@
 package controller
 
 import (
-	"github.com/rogbas/dedicated-admin-operator/pkg/controller/rolebinding"
+	"github.com/openshift/dedicated-admin-operator/pkg/controller/rolebinding"
 )
 
 func init() {

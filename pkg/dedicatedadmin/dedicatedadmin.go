@@ -19,7 +19,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rogbas/dedicated-admin-operator/config"
+	"github.com/openshift/dedicated-admin-operator/config"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"

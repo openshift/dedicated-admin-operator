@@ -17,7 +17,7 @@ package rolebinding
 import (
 	"context"
 
-	"github.com/rogbas/dedicated-admin-operator/pkg/dedicatedadmin"
+	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
