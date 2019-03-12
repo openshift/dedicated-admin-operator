@@ -1,27 +1,26 @@
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: dedicated-admin-operator
-subjects:
-- kind: ServiceAccount
-  name: dedicated-admin-operator
-  namespace: openshift-dedicated-admin
-roleRef:
-  kind: ClusterRole
-  name: dedicated-admin-operator
-  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: dedicated-admin-operator-configmaps
-  namespace: openshift-dedicated-admin
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: dedicated-admin-operator-configmaps
+  name: dedicated-admin-operator
 subjects:
 - kind: ServiceAccount
   name: dedicated-admin-operator
   namespace: openshift-dedicated-admin
-
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dedicated-admin-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dedicated-admin-operator-project
+subjects:
+- kind: ServiceAccount
+  name: dedicated-admin-operator
+  namespace: openshift-dedicated-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dedicated-project-admin

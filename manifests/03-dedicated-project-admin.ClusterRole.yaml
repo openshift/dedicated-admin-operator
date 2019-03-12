@@ -1,61 +1,8 @@
-kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: dedicated-admin-operator
+  name: dedicated-project-admin
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  - pods
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  - daemonsets
-  - replicasets
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - servicemonitors
-  verbs:
-  - "get"
-  - "create"
-- apiGroups:
-  - ""
-  - authorization.openshift.io
-  attributeRestrictions: null
-  resources:
-  - rolebindings
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  attributeRestrictions: null
-  resources:
-  - rolebindings
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
 - apiGroups:
   - ""
   attributeRestrictions: null
@@ -97,17 +44,12 @@ rules:
   - patch
   - update
   - watch
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: dedicated-admin-operator-configmaps
-  namespace: openshift-dedicated-admin
-rules:
 - apiGroups:
-  - ""
+  - rbac.authorization.k8s.io
+  attributeRestrictions: null
   resources:
-  - configmaps
+  - clusterrolebindings
+  - rolebindings
   verbs:
   - create
   - delete
@@ -115,4 +57,46 @@ rules:
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - events
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - network.openshift.io
+  attributeRestrictions: null
+  resources:
+  - clusternetworks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - image.openshift.io
+  attributeRestrictions: null
+  resources:
+  - images
+  - imagestreamtags
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - build.openshift.io
+  attributeRestrictions: null
+  resources:
+  - buildconfigs
+  - builds
+  verbs:
+  - get
+  - list
   - watch

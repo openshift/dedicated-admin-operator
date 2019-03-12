@@ -1,4 +1,4 @@
-apiVersion: authorization.openshift.io/v1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -6,57 +6,10 @@ metadata:
   name: dedicated-cluster-admin
 rules:
 - apiGroups:
-  - ""
-  - user.openshift.io
-  attributeRestrictions: null
-  resources:
-  - groups
-  - identities
-  - useridentitymappings
-  - users
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  - authorization.openshift.io
-  attributeRestrictions: null
-  resources:
-  - clusterrolebindings
-  - rolebindings
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - rbac.authorization.k8s.io
   attributeRestrictions: null
   resources:
   - clusterrolebindings
-  - rolebindings
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  - oauth.openshift.io
-  attributeRestrictions: null
-  resources:
-  - oauthclients
   verbs:
   - create
   - delete
@@ -104,11 +57,8 @@ rules:
   - ""
   attributeRestrictions: null
   resources:
-  - events
-  - minions
   - nodes
   - persistentvolumes
-  - pods
   verbs:
   - get
   - list
@@ -144,17 +94,6 @@ rules:
   - list
 - apiGroups:
   - ""
-  - image.openshift.io
-  attributeRestrictions: null
-  resources:
-  - images
-  - imagestreamtags
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
   - network.openshift.io
   attributeRestrictions: null
   resources:
@@ -163,23 +102,3 @@ rules:
   - get
   - list
   - update
-- apiGroups:
-  - ""
-  - network.openshift.io
-  attributeRestrictions: null
-  resources:
-  - clusternetworks
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - ""
-  - build.openshift.io
-  attributeRestrictions: null
-  resources:
-  - buildconfigs
-  - builds
-  verbs:
-  - get
-  - list
-  - watch
