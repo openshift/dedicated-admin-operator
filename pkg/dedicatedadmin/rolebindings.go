@@ -20,9 +20,9 @@ import (
 )
 
 var Rolebindings = map[string]rbacv1.RoleBinding{
-	"dedicated-project-admin": {
+	"dedicated-project-admin-0": {
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "dedicated-project-admin",
+			Name: "dedicated-project-admin-0",
 		},
 		Subjects: []rbacv1.Subject{
 			{
@@ -35,6 +35,23 @@ var Rolebindings = map[string]rbacv1.RoleBinding{
 			APIGroup: "rbac.authorization.k8s.io",
 			Kind:     "ClusterRole",
 			Name:     "dedicated-project-admin",
+		},
+	},
+	"dedicated-project-admin-1": {
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "dedicated-project-admin-1",
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "dedicated-admins",
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     "admin",
 		},
 	},
 }
