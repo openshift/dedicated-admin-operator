@@ -15,7 +15,7 @@
 package controller
 
 import (
-	"github.com/rogbas/dedicated-admin-operator/pkg/controller/namespace"
+	"github.com/openshift/dedicated-admin-operator/pkg/controller/namespace"
 )
 
 func init() {
