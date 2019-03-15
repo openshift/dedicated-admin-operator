@@ -15,4 +15,8 @@ The Dedicated Admin Operator exposes the following Prometheus metrics:
 
 * dedicated_admin_blacklisted: gauge of blacklisted namespaces
 
-
+## Buid Notes
+The Dockerfile provided (in `build/Dockerfile`) takes advantage of the multi-stage feature, so docker version >= 17.05 is required. To build it locally please use:
+```
+docker build -f build/Dockerfile . -t openshift/dedicated-admin-operator:latest
+``` 
