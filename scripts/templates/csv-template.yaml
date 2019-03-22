@@ -1,0 +1,43 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: dedicated-admin-operator-0.0.1
+  namespace: openshift-dedicated-admin
+  annotations:
+    categories: A list of comma separated categories that your operator falls under.
+    certified: "false"
+    description: OpenShift cluster provisioning and management at scale.
+    containerImage: quay.io/redhat/dedicated-admin-operator:latest
+    createdAt: "2019-03-22T14:29:00Z"
+    support: OSD SRE
+spec:
+  displayName: dedicated-admin-operator
+  description: Operator to manage dedicated admins access
+  keywords:
+  - kubernetes
+  - openshift
+  - multi-cluster
+  - cluster
+  version: 0.0.1
+  provider:
+    name: Red Hat, Inc
+  maturity: alpha
+  installModes:
+  - type: OwnNamespace
+    supported: true
+  - type: SingleNamespace
+    supported: true
+  - type: MultiNamespace
+    supported: false
+  - type: AllNamespaces
+    supported: false
+  install:
+    strategy: deployment
+    spec:
+      clusterPermissions:
+      - serviceAccountName: dedicated-admin-operator
+        # Rules will be added here by the generate-csv.py script.
+      deployments:
+      - name: dedicated-admin-operator
+        # Deployment spec will be added here by the generate-csv.py script.
+
