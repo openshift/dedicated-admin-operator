@@ -33,12 +33,13 @@ if __name__ == '__main__':
     # version like: 0.1.189-3f73a592
     VERSION_BASE = "0.1"
     ASSETS_FOLDER = "manifests"
+    OPERATOR_NAME = "dedicated-admin-operator"
 
     if len(sys.argv) != 4:
         print("USAGE: %s OUTPUT_DIR PREVIOUS_VERSION IMAGE_NAME" % sys.argv[0])
         sys.exit(1)
 
-    outdir = sys.argv[1]
+    outdir = sys.argv[1] + os.sep + OPERATOR_NAME
     prev_version = sys.argv[2]
     operator_image = sys.argv[3]
     git_num_commits = get_num_commits()
