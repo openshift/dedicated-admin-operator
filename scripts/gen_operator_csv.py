@@ -88,7 +88,8 @@ if __name__ == '__main__':
     # Update the versions to include git hash:
     csv['metadata']['name'] = "dedicated-admin-operator.v%s" % full_version
     csv['spec']['version'] = full_version
-    csv['spec']['replaces'] = "dedicated-admin-operator.v%s" % prev_version
+    if prev_version != "__undefined__" and prev_version != full_version:
+        csv['spec']['replaces'] = "dedicated-admin-operator.v%s" % prev_version
 
     # Set the CSV createdAt annotation:
     now = datetime.datetime.now()
