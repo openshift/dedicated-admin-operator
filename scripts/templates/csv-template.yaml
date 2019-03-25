@@ -1,14 +1,14 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: dedicated-admin-operator-0.0.1
+  name: dedicated-admin-operator-v$FULL_VERSION
   namespace: openshift-dedicated-admin
   annotations:
     categories: A list of comma separated categories that your operator falls under.
     certified: "false"
     description: OpenShift cluster provisioning and management at scale.
     containerImage: quay.io/redhat/dedicated-admin-operator:latest
-    createdAt: "2019-03-22T14:29:00Z"
+    createdAt: "$TIME"
     support: OSD SRE
 spec:
   displayName: dedicated-admin-operator
@@ -18,7 +18,7 @@ spec:
   - openshift
   - multi-cluster
   - cluster
-  version: 0.0.1
+  version: $FULL_VERSION
   provider:
     name: Red Hat, Inc
   maturity: alpha

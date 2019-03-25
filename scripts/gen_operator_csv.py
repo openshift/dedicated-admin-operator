@@ -32,6 +32,7 @@ if __name__ == '__main__':
     # (presumably since some past base tag), and the git hash arg for a final
     # version like: 0.1.189-3f73a592
     VERSION_BASE = "0.1"
+    ASSETS_FOLDER = "manifests"
 
     if len(sys.argv) != 4:
         print("USAGE: %s OUTPUT_DIR PREVIOUS_VERSION IMAGE_NAME" % sys.argv[0])
@@ -58,29 +59,24 @@ if __name__ == '__main__':
 
     csv['spec']['install']['spec']['clusterPermissions'] = []
 
-    cluster_roles = [
-        {'permissions': 'manifests/05-dedicated-admin-operator.ClusterRole.yaml', 'serviceAccountName': 'dedicated-admin-operator'}
-    ]
+    for subdir, dirs, files in os.walk(ASSETS_FOLDER):
+        for file in files:
+            file_path = subdir + os.sep + file
 
-    for role in cluster_roles:
-    # Add our operator role to the CSV:
-        with open(role['permissions'], 'r') as stream:
-            operator_role = yaml.load(stream)
-            csv['spec']['install']['spec']['clusterPermissions'].append(
-                {
-                    'rules': operator_role['rules'],
-                    'serviceAccountName': role['serviceAccountName'],
-                })
-
-
-    # Add our deployment spec
-    with open('manifests/51-dedicated-admin-operator.Deployment.yaml', 'r') as stream:
-        operator_components = []
-        operator = yaml.load_all(stream)
-        for doc in operator:
-            operator_components.append(doc)
-        operator_deployment = operator_components[0]
-        csv['spec']['install']['spec']['deployments'][0]['spec'] = operator_deployment['spec']
+            # Parse each file breaking per doc (we might have 2 or more objs in the same yaml file)
+            with open(file_path) as stream:
+                yaml_file = yaml.load_all(stream)
+                for obj in yaml_file:
+                    if obj['kind'] == 'ClusterRole' and obj['metadata']['name'] == 'dedicated-admin-operator':
+                        print('Parsing file for ClusterRole: {}'.format(file_path))
+                        csv['spec']['install']['spec']['clusterPermissions'].append(
+                        {
+                            'rules': obj['rules'],
+                            'serviceAccountName': 'dedicated-admin-operator',
+                        })
+                    elif obj['kind'] == 'Deployment' and obj['metadata']['name'] == 'dedicated-admin-operator':
+                        print('Parsing file for Deployment: {}'.format(file_path))
+                        csv['spec']['install']['spec']['deployments'][0]['spec'] = obj['spec']
 
     # Update the deployment to use the defined image:
     csv['spec']['install']['spec']['deployments'][0]['spec']['template']['spec']['containers'][0]['image'] = operator_image
