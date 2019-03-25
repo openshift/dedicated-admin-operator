@@ -6,6 +6,8 @@
 #
 # Usage ./scripts/gen_operator_csv.py OUTPUT_DIR PREVIOUS_VERSION IMAGE_NAME
 # Example: scripts/gen_operator_csv.py tmp 0.1 quay.io/redhat/dedicated-admin-operator:latest
+# If there is no previous version, specify __undefined__ instead of 0.1, ex:
+# scripts/gen_operator_csv.py tmp __undefined__ quay.io/redhat/dedicated-admin-operator:latest
 
 import datetime
 import os
