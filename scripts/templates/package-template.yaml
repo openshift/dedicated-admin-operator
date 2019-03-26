@@ -1,0 +1,4 @@
+packageName: dedicated-admin-operator
+channels:
+- name: alpha
+  currentCSV: $CURRENTCSV

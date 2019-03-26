@@ -1,0 +1,9 @@
+FROM quay.io/openshift/origin-operator-registry:latest
+
+ARG csvsrc
+
+COPY ${csvsrc} manifests
+
+RUN initializer
+
+CMD ["registry-server" , "-t" , "/tmp/terminate.log"]
