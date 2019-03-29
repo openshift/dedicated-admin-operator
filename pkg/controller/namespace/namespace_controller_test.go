@@ -2,6 +2,7 @@ package namespace
 
 import (
 	"context"
+	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -113,8 +114,18 @@ func TestUnBlockedNamespace(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while trying to list RBAC entries: %s", err)
 	}
-	if len(list.Items) != 2 {
-		t.Errorf("Expected 2 RoleBindings to have been created, got %d\n", len(list.Items))
+	// we have some RoleBindings in dedicatedadmin.Rolebindings, so let's make sure we have them here, too
+	seen := make(map[string]bool)
+	for _, rb := range dedicatedadmin.Rolebindings {
+		seen[rb.ObjectMeta.Name] = false
+	}
+	for _, rb := range list.Items {
+		seen[rb.ObjectMeta.Name] = true
+	}
+	for rb_name, s := range seen {
+		if !s {
+			t.Errorf("Expected to have RoleBinding created with the name %s, but didn't see one", rb_name)
+		}
 	}
 }
 
