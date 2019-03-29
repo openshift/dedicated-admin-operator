@@ -3,7 +3,7 @@ MAINPACKAGE=./cmd/manager
 GOENV=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
 GOFLAGS=-gcflags="all=-trimpath=${GOPATH}" -asmflags="all=-trimpath=${GOPATH}"
 
-TESTTARGETS := github.com/openshift/dedicated-admin-operator/pkg/controller/namespace github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin
+TESTTARGETS := $(shell go list -e ./... | egrep -v "/(vendor)/")
 # ex, -v
 TESTOPTS := 
 
