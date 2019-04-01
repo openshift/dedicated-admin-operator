@@ -11,8 +11,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	realclient "sigs.k8s.io/controller-runtime/pkg/client"
 	client "sigs.k8s.io/controller-runtime/pkg/client/fake"
-	//"sigs.k8s.io/controller-runtime/pkg/client/config"
-	//"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
