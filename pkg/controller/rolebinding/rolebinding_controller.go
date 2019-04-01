@@ -16,6 +16,7 @@ package rolebinding
 
 import (
 	"context"
+	"time"
 
 	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -86,6 +87,10 @@ func (r *ReconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 	operatorConfig, err := dedicatedadmin.GetOperatorConfig(ctx, r.client)
 	if err != nil {
 		reqLogger.Info("Error Loading Operator Config", "Error", err)
+	}
+	if _, ok := operatorConfig.Data["project_blacklist"]; !ok {
+		reqLogger.Info("Operator config data is missing (expected key `project_blacklist`). Retry in 5 seconds.", "Error", err)
+		return reconcile.Result{Requeue: true, RequeueAfter: 5 * time.Second}, err
 	}
 
 	// Skip if it's a reserved namespace

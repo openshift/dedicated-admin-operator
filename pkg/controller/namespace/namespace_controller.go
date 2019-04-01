@@ -16,6 +16,7 @@ package namespace
 
 import (
 	"context"
+	"time"
 
 	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
 	"github.com/openshift/dedicated-admin-operator/pkg/metrics"
@@ -83,7 +84,6 @@ type ReconcileNamespace struct {
 // rolebindings when applicable (not black listed)
 func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	ctx := context.Background()
-
 	// Initialize logging object
 	reqLogger := log.WithValues("Request.Namespace", request.Name)
 
@@ -91,6 +91,11 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 	operatorConfig, err := dedicatedadmin.GetOperatorConfig(ctx, r.client)
 	if err != nil {
 		reqLogger.Info("Error Loading Operator Config", "Error", err)
+	}
+
+	if _, ok := operatorConfig.Data["project_blacklist"]; !ok {
+		reqLogger.Info("Operator config data is missing (expected key `project_blacklist`). Retry in 5 seconds.", "Error", err)
+		return reconcile.Result{Requeue: true, RequeueAfter: 5 * time.Second}, err
 	}
 
 	// Check if the namespace is black listed - administrative namespaces where we
@@ -131,7 +136,6 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 
 		return reconcile.Result{}, nil
 	}
-
 	// Loop thru our map of rolebindings, adding each one to the namespace
 	for _, rb := range dedicatedadmin.Rolebindings {
 		reqLogger.Info("Assigning RoleBinding to Namespace", "RoleBinding", rb.Name)
