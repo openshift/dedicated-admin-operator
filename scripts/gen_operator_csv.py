@@ -16,7 +16,6 @@ import yaml
 import shutil
 import subprocess
 
-
 def get_git_sha():
     sha = subprocess.check_output('git rev-parse HEAD', shell=True)
     return str(sha)[0:7]
@@ -35,49 +34,80 @@ if __name__ == '__main__':
     ASSETS_FOLDER = "manifests"
     OPERATOR_NAME = "dedicated-admin-operator"
 
-    if len(sys.argv) != 4:
-        print("USAGE: %s OUTPUT_DIR PREVIOUS_VERSION IMAGE_NAME" % sys.argv[0])
+    if len(sys.argv) != 3:
+        print("USAGE: %s OUTPUT_DIR IMAGE_NAME" % sys.argv[0])
         sys.exit(1)
 
     outdir = sys.argv[1] + os.sep + OPERATOR_NAME
-    prev_version = sys.argv[2]
-    operator_image = sys.argv[3]
+    operator_image = sys.argv[2]
     git_num_commits = get_num_commits()
     git_sha = get_git_sha()
 
     full_version = "%s.%s-%s" % (VERSION_BASE, git_num_commits, git_sha)
-    print("Generating CSV for version: %s" % full_version)
 
     if not os.path.exists(outdir):
         os.mkdir(outdir)
+
+    # update operator package
+    package_filename = OPERATOR_NAME + ".package.yaml"
+    package_file = os.path.join(outdir, package_filename)
+    with open(package_file) as stream:
+        package = yaml.load(stream, Loader=yaml.FullLoader)
+        for channel in package['channels']:
+            prev_csv = channel['currentCSV']
+            package['channels'][0]['currentCSV'] = OPERATOR_NAME + ".v" + full_version
+
+    with open(package_file, 'w') as outfile:
+        yaml.dump(package, outfile, default_flow_style=False)
+    print("Wrote Package: %s" % package_file)
+
+    print("Generating CSV for version: %s" % full_version)
 
     version_dir = os.path.join(outdir, full_version)
     if not os.path.exists(version_dir):
         os.mkdir(version_dir)
 
     with open('scripts/templates/csv-template.yaml', 'r') as stream:
-        csv = yaml.load(stream)
+        csv = yaml.load(stream, Loader=yaml.FullLoader)
 
     csv['spec']['install']['spec']['clusterPermissions'] = []
+
+    SA_NAME="dedicated-admin-operator"
+    clusterrole_names_csv = []
 
     for subdir, dirs, files in os.walk(ASSETS_FOLDER):
         for file in files:
             file_path = subdir + os.sep + file
 
-            # Parse each file breaking per doc (we might have 2 or more objs in the same yaml file)
+            # Parse each file and look for ClusterRoleBindings to the SA
             with open(file_path) as stream:
-                yaml_file = yaml.load_all(stream)
+                yaml_file = yaml.safe_load_all(stream)
                 for obj in yaml_file:
-                    if obj['kind'] == 'ClusterRole' and obj['metadata']['name'] == 'dedicated-admin-operator':
-                        print('Parsing file for ClusterRole: {}'.format(file_path))
+                    if obj['kind'] == 'ClusterRoleBinding':
+                        for subject in obj['subjects']:
+                            if subject['kind'] == 'ServiceAccount' and subject['name'] == SA_NAME:
+                                clusterrole_names_csv.append(obj['roleRef']['name'])
+
+    for subdir, dirs, files in os.walk(ASSETS_FOLDER):
+        for file in files:
+            file_path = subdir + os.sep + file
+            # Parse files to manage clusterPermissions and deployments in csv
+            with open(file_path) as stream:
+                yaml_file = yaml.safe_load_all(stream)
+                for obj in yaml_file:
+                    if obj['kind'] == 'ClusterRole' and any(obj['metadata']['name'] in cr for cr in clusterrole_names_csv):
+                        print('Adding ClusterRole to CSV: {}'.format(file_path))
                         csv['spec']['install']['spec']['clusterPermissions'].append(
                         {
                             'rules': obj['rules'],
-                            'serviceAccountName': 'dedicated-admin-operator',
+                            'serviceAccountName': SA_NAME,
                         })
-                    elif obj['kind'] == 'Deployment' and obj['metadata']['name'] == 'dedicated-admin-operator':
-                        print('Parsing file for Deployment: {}'.format(file_path))
+                    if obj['kind'] == 'Deployment' and obj['metadata']['name'] == 'dedicated-admin-operator':
+                        print('Adding Deployment to CSV: {}'.format(file_path))
                         csv['spec']['install']['spec']['deployments'][0]['spec'] = obj['spec']
+                    if obj['kind'] == 'ClusterRole' or obj['kind'] == 'Role' or obj['kind'] == 'RoleBinding':
+                        print('Adding {} to Catalog: {}'.format(obj['kind'], file_path))
+                        shutil.copyfile(file_path, os.path.join(version_dir, file.lower()))
 
     # Update the deployment to use the defined image:
     csv['spec']['install']['spec']['deployments'][0]['spec']['template']['spec']['containers'][0]['image'] = operator_image
@@ -85,8 +115,8 @@ if __name__ == '__main__':
     # Update the versions to include git hash:
     csv['metadata']['name'] = "dedicated-admin-operator.v%s" % full_version
     csv['spec']['version'] = full_version
-    if prev_version != "__undefined__" and prev_version != full_version:
-        csv['spec']['replaces'] = "dedicated-admin-operator.v%s" % prev_version
+    if prev_csv != "__undefined__" and prev_csv != full_version:
+        csv['spec']['replaces'] = prev_csv
 
     # Set the CSV createdAt annotation:
     now = datetime.datetime.now()
@@ -98,4 +128,3 @@ if __name__ == '__main__':
     with open(csv_file, 'w') as outfile:
         yaml.dump(csv, outfile, default_flow_style=False)
     print("Wrote ClusterServiceVersion: %s" % csv_file)
-

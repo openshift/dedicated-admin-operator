@@ -15,8 +15,21 @@ The Dedicated Admin Operator exposes the following Prometheus metrics:
 
 * dedicated_admin_blacklisted: gauge of blacklisted namespaces
 
-## Buid Notes
-The Dockerfile provided (in `build/Dockerfile`) takes advantage of the multi-stage feature, so docker version >= 17.05 is required. To build it locally please use:
+# Building
+
+## Docker
+The Dockerfile provided (in `build/ci-operator/Dockerfile`) takes advantage of the multi-stage feature, so docker version >= 17.05 is required. To build it locally please use:
+
 ```
-docker build -f build/Dockerfile . -t openshift/dedicated-admin-operator:latest
-``` 
+docker build -f build/ci-operator/Dockerfile . -t quay.io/openshift-sre/dedicated-admin-operator:latest
+docker push quay.io/openshift-sre/dedicated-admin-operator:latest
+```
+
+## OLM
+You can generate grpc catalog source.  Assuming repo `osd-operators` is checked out as a peer to this code and you have a clean status (no pending changes to commit):
+
+```
+./scripts/gen_operator_csv.py ../osd-operators/operators quay.io/openshift-sre/dedicated-admin-operator:latest
+```
+
+See `osd-operators` for notes on building and using the CatalogSource.

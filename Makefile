@@ -7,6 +7,10 @@ TESTTARGETS := $(shell go list -e ./... | egrep -v "/(vendor)/")
 # ex, -v
 TESTOPTS := 
 
+.PHONY: clean
+clean:
+	rm -rf ./build/_output
+
 .PHONY: check
 check: ## Lint code
 	gofmt -s -l $(shell go list -f '{{ .Dir }}' ./... ) | grep ".*\.go"; if [ "$$?" = "0" ]; then gofmt -s -d $(shell go list -f '{{ .Dir }}' ./... ); exit 1; fi
@@ -17,6 +21,5 @@ build: test ## Build binary
 	${GOENV} go build ${GOFLAGS} -o ${BINFILE} ${MAINPACKAGE}
 
 .PHONY: test
-
 test:
 	go test $(TESTOPTS) $(TESTTARGETS)
