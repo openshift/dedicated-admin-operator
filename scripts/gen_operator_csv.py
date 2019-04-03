@@ -15,11 +15,12 @@ import sys
 import yaml
 import shutil
 import subprocess
+import datetime
 
 
 def get_git_sha():
     sha = subprocess.check_output('git rev-parse HEAD', shell=True)
-    return str(sha)[0:7]
+    return str(sha)[0:8]
 
 def get_num_commits():
     num = subprocess.check_output('git rev-list HEAD --count', shell=True)
@@ -30,22 +31,26 @@ if __name__ == '__main__':
 
     # This script will append the current number of commits given as an arg
     # (presumably since some past base tag), and the git hash arg for a final
-    # version like: 0.1.189-3f73a592
-    VERSION_BASE = "0.1"
+    # version like: 0.1.189-YYYY-MM-DD-3f73a592
     ASSETS_FOLDER = "manifests"
     OPERATOR_NAME = "dedicated-admin-operator"
+    year = datetime.datetime.now().year
+    month = datetime.datetime.now().month
+    day = datetime.datetime.now().day
 
-    if len(sys.argv) != 4:
-        print("USAGE: %s OUTPUT_DIR PREVIOUS_VERSION IMAGE_NAME" % sys.argv[0])
+    if len(sys.argv) != 5:
+        print("USAGE: %s OUTPUT_DIR VERSION_BASE PREVIOUS_VERSION IMAGE_NAME" % sys.argv[0])
         sys.exit(1)
 
     outdir = sys.argv[1] + os.sep + OPERATOR_NAME
-    prev_version = sys.argv[2]
-    operator_image = sys.argv[3]
+    version_base = sys.argv[2]
+    prev_version = sys.argv[3]
+    operator_image = sys.argv[4]
     git_num_commits = get_num_commits()
     git_sha = get_git_sha()
 
-    full_version = "%s.%s-%s" % (VERSION_BASE, git_num_commits, git_sha)
+    date_string = "%s-%s-%s" % (year, format(month, '02'), format(day, '02'))
+    full_version = "%s.%s-%s-%s" % (version_base, git_num_commits, date_string, git_sha)
     print("Generating CSV for version: %s" % full_version)
 
     if not os.path.exists(outdir):
