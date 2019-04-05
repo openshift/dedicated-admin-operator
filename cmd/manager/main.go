@@ -20,8 +20,10 @@ import (
 
 	"fmt"
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	"github.com/openshift/dedicated-admin-operator/pkg/apis"
 	"github.com/openshift/dedicated-admin-operator/pkg/controller"
+	"github.com/openshift/dedicated-admin-operator/pkg/metrics"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
@@ -76,7 +78,7 @@ func main() {
 	ctx := context.TODO()
 
 	// Become the leader before proceeding
-	err = leader.Become(ctx, "dedicated-admin-operator-lock")
+	err = leader.Become(ctx, operatorconfig.OperatorName+"-lock")
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)
@@ -110,6 +112,10 @@ func main() {
 		log.Error(err, "")
 		os.Exit(1)
 	}
+
+	log.Info("Starting Metrics.")
+
+	metrics.StartMetrics()
 
 	log.Info("Starting the Cmd.")
 

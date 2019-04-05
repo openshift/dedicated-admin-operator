@@ -32,15 +32,16 @@ BUILD_DATE=$(shell date -u +%Y-%m-%d)
 CURRENT_COMMIT=$(shell git rev-parse --short=8 HEAD)
 VERSION_FULL=$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(BUILD_DATE)-$(CURRENT_COMMIT)
 
-BINFILE=build/_output/bin/dedicated-admin-operator
+BINFILE=build/_output/bin/$(OPERATOR_NAME)
 MAINPACKAGE=./cmd/manager
 GOENV=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
 GOFLAGS=-gcflags="all=-trimpath=${GOPATH}" -asmflags="all=-trimpath=${GOPATH}"
 
-
 TESTTARGETS := $(shell go list -e ./... | egrep -v "/(vendor)/")
 # ex, -v
 TESTOPTS := 
+
+default: gobuild
 
 .PHONY: clean
 clean:

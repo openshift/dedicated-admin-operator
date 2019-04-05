@@ -17,6 +17,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/openshift/dedicated-admin-operator/config"
 	dedicatedadminproject "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/project"
 
 	corev1 "k8s.io/api/core/v1"
@@ -168,8 +169,8 @@ func makeNamespace(ns string) *corev1.Namespace {
 func makeConfig() *corev1.ConfigMap {
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "dedicated-admin-operator-config",
-			Namespace: "openshift-dedicated-admin",
+			Name:      config.OperatorConfigMapName,
+			Namespace: config.OperatorNamespace,
 		},
 		Data: map[string]string{
 			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",

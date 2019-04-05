@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	"github.com/openshift/dedicated-admin-operator/config"
 	dedicatedadminoperator "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/operator"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -29,10 +30,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-var nsName = "openshift-dedicated-admin"
-
 func reset(ctx context.Context, r *ReconcileNamespace) {
-	r.client.Delete(ctx, makeNamespace(nsName))
+	r.client.Delete(ctx, makeNamespace(config.OperatorNamespace))
 }
 
 func makeTestReconciler() *ReconcileNamespace {
@@ -71,14 +70,14 @@ func TestValidNamespace(t *testing.T) {
 	defer reset(ctx, reconciler)
 
 	// create namespace needed for the test
-	nerr := reconciler.client.Create(ctx, makeNamespace(nsName))
+	nerr := reconciler.client.Create(ctx, makeNamespace(config.OperatorNamespace))
 	if nerr != nil {
-		t.Errorf("Couldn't create the required namespace: %s", nsName)
+		t.Errorf("Couldn't create the required namespace: %s", config.OperatorNamespace)
 	}
 
 	request := reconcile.Request{
 		NamespacedName: types.NamespacedName{
-			Name:      nsName,
+			Name:      config.OperatorNamespace,
 			Namespace: "",
 		},
 	}
