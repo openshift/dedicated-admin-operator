@@ -1,6 +1,7 @@
 # Project specific values
-IMAGE_REPO=quay.io/openshift-sre
-IMAGE_NAME=dedicated-admin-operator
+IMAGE_REGISTRY?=quay.io
+IMAGE_REPOSITORY?=openshift-sre
+IMAGE_NAME?=dedicated-admin-operator
 
-VERSION_MAJOR=0
-VERSION_MINOR=1
+VERSION_MAJOR?=0
+VERSION_MINOR?=1

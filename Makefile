@@ -2,15 +2,19 @@ SHELL := /usr/bin/env bash
 
 # Include project specific values file
 # Requires the following variables:
-# - IMAGE_REPO
+# - IMAGE_REGISTRY
+# - IMAGE_REPOSITORY
 # - IMAGE_NAME
 # - VERSION_MAJOR
 # - VERSION_MINOR
 include project.mk
 
 # Validate variables in project.mk exist
-ifndef IMAGE_REPO
-$(error IMAGE_REPO is not set; check project.mk file)
+ifndef IMAGE_REGISTRY
+$(error IMAGE_REGISTRY is not set; check project.mk file)
+endif
+ifndef IMAGE_REPOSITORY
+$(error IMAGE_REPOSITORY is not set; check project.mk file)
 endif
 ifndef IMAGE_NAME
 $(error IMAGE_NAME is not set; check project.mk file)
@@ -43,17 +47,25 @@ TESTOPTS :=
 clean:
 	rm -rf ./build/_output
 
-.PHONY: check
-check: ## Lint code
+.PHONY: build
+build:
+	docker build . -f build/ci-operator/Dockerfile -t $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
+
+.PHONY: push
+push:
+	docker push $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
+
+.PHONY: gocheck
+gocheck: ## Lint code
 	gofmt -s -l $(shell go list -f '{{ .Dir }}' ./... ) | grep ".*\.go"; if [ "$$?" = "0" ]; then gofmt -s -d $(shell go list -f '{{ .Dir }}' ./... ); exit 1; fi
 	go vet ./cmd/... ./pkg/...
 
-.PHONY: build
-build: test ## Build binary
+.PHONY: gobuild
+gobuild: gocheck gotest ## Build binary
 	${GOENV} go build ${GOFLAGS} -o ${BINFILE} ${MAINPACKAGE}
 
-.PHONY: test
-test:
+.PHONY: gotest
+gotest:
 	go test $(TESTOPTS) $(TESTTARGETS)
 
 .PHONY: version
