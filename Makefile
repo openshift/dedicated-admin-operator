@@ -71,3 +71,7 @@ gotest:
 .PHONY: version
 version:
 	@echo $(VERSION_FULL)
+
+.PHONY: imagename
+imagename:
+	@echo $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
