@@ -30,7 +30,7 @@ endif
 COMMIT_NUMBER=$(shell git rev-list `git rev-list --parents HEAD | egrep "^[a-f0-9]{40}$$"`..HEAD --count)
 BUILD_DATE=$(shell date -u +%Y-%m-%d)
 CURRENT_COMMIT=$(shell git rev-parse --short=8 HEAD)
-VERSION_FULL=v$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(BUILD_DATE)-$(CURRENT_COMMIT)
+VERSION_FULL=$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(BUILD_DATE)-$(CURRENT_COMMIT)
 
 BINFILE=build/_output/bin/dedicated-admin-operator
 MAINPACKAGE=./cmd/manager
@@ -48,11 +48,11 @@ clean:
 
 .PHONY: build
 build:
-	docker build . -f build/ci-operator/Dockerfile -t $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
+	docker build . -f build/ci-operator/Dockerfile -t $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
 
 .PHONY: push
 push:
-	docker push $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
+	docker push $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
 
 .PHONY: gocheck
 gocheck: ## Lint code
