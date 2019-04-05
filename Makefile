@@ -58,4 +58,4 @@ test:
 
 .PHONY: version
 version:
-	echo $(VERSION_FULL)
+	@echo $(VERSION_FULL)
