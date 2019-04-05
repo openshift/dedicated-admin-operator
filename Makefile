@@ -32,7 +32,6 @@ BUILD_DATE=$(shell date -u +%Y-%m-%d)
 CURRENT_COMMIT=$(shell git rev-parse --short=8 HEAD)
 VERSION_FULL=v$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(BUILD_DATE)-$(CURRENT_COMMIT)
 
-
 BINFILE=build/_output/bin/dedicated-admin-operator
 MAINPACKAGE=./cmd/manager
 GOENV=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
@@ -68,10 +67,8 @@ gobuild: gocheck gotest ## Build binary
 gotest:
 	go test $(TESTOPTS) $(TESTTARGETS)
 
-.PHONY: version
-version:
-	@echo $(VERSION_FULL)
-
-.PHONY: imagename
-imagename:
-	@echo $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
+.PHONY: env
+env:
+	@echo OPERATOR_NAME=$(OPERATOR_NAME)
+	@echo OPERATOR_VERSION=$(VERSION_FULL)
+	@echo OPERATOR_IMAGE=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):$(VERSION_FULL)
