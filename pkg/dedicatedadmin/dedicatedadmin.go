@@ -19,7 +19,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/openshift/dedicated-admin-operator/config"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -46,8 +46,8 @@ func IsBlackListedNamespace(namespace string, blacklistedNamespaces string) bool
 func GetOperatorConfig(ctx context.Context, k8sClient client.Client) (*corev1.ConfigMap, error) {
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.OperatorConfigMapName,
-			Namespace: config.OperatorNamespace,
+			Name:      operatorconfig.OperatorConfigMapName,
+			Namespace: operatorconfig.OperatorNamespace,
 		},
 		Data: map[string]string{
 			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",

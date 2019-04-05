@@ -16,7 +16,7 @@ package operator
 
 import (
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
-	"github.com/openshift/dedicated-admin-operator/config"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,10 +44,10 @@ var ClusterRoleBindings = map[string]rbacv1.ClusterRoleBinding{
 var Services = map[string]corev1.Service{
 	"dedicated-admin-operator": {
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.OperatorName,
-			Namespace: config.OperatorNamespace,
+			Name:      operatorconfig.OperatorName,
+			Namespace: operatorconfig.OperatorNamespace,
 			Labels: map[string]string{
-				"k8s-app": config.OperatorName,
+				"k8s-app": operatorconfig.OperatorName,
 			},
 		},
 		Spec: corev1.ServiceSpec{
@@ -58,7 +58,7 @@ var Services = map[string]corev1.Service{
 				},
 			},
 			Selector: map[string]string{
-				"k8s-app": config.OperatorName,
+				"k8s-app": operatorconfig.OperatorName,
 			},
 			Type: "ClusterIP",
 		},
@@ -68,10 +68,10 @@ var Services = map[string]corev1.Service{
 var ServiceMonitors = map[string]monitoringv1.ServiceMonitor{
 	"dedicated-admin-operator": {
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      config.OperatorName,
-			Namespace: config.OperatorNamespace,
+			Name:      operatorconfig.OperatorName,
+			Namespace: operatorconfig.OperatorNamespace,
 			Labels: map[string]string{
-				"k8s-app": config.OperatorName,
+				"k8s-app": operatorconfig.OperatorName,
 			},
 		},
 		Spec: monitoringv1.ServiceMonitorSpec{
@@ -84,7 +84,7 @@ var ServiceMonitors = map[string]monitoringv1.ServiceMonitor{
 			},
 			Selector: metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"k8s-app": config.OperatorName,
+					"k8s-app": operatorconfig.OperatorName,
 				},
 			},
 		},

@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
-	"github.com/openshift/dedicated-admin-operator/config"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	dedicatedadminoperator "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/operator"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -31,7 +31,7 @@ import (
 )
 
 func reset(ctx context.Context, r *ReconcileNamespace) {
-	r.client.Delete(ctx, makeNamespace(config.OperatorNamespace))
+	r.client.Delete(ctx, makeNamespace(operatorconfig.OperatorNamespace))
 }
 
 func makeTestReconciler() *ReconcileNamespace {
@@ -70,14 +70,14 @@ func TestValidNamespace(t *testing.T) {
 	defer reset(ctx, reconciler)
 
 	// create namespace needed for the test
-	nerr := reconciler.client.Create(ctx, makeNamespace(config.OperatorNamespace))
+	nerr := reconciler.client.Create(ctx, makeNamespace(operatorconfig.OperatorNamespace))
 	if nerr != nil {
-		t.Errorf("Couldn't create the required namespace: %s", config.OperatorNamespace)
+		t.Errorf("Couldn't create the required namespace: %s", operatorconfig.OperatorNamespace)
 	}
 
 	request := reconcile.Request{
 		NamespacedName: types.NamespacedName{
-			Name:      config.OperatorNamespace,
+			Name:      operatorconfig.OperatorNamespace,
 			Namespace: "",
 		},
 	}

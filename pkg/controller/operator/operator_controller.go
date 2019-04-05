@@ -17,7 +17,7 @@ package operator
 import (
 	"context"
 
-	"github.com/openshift/dedicated-admin-operator/config"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
 	dedicatedadminoperator "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/operator"
 	corev1 "k8s.io/api/core/v1"
@@ -85,7 +85,7 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 
 	// Check if the namespace is black listed - administrative namespaces where we
 	// don't want to add the dedicated-admin rolebinding, e. g kube-system, openshift-logging
-	if request.Name != config.OperatorNamespace {
+	if request.Name != operatorconfig.OperatorNamespace {
 		reqLogger.Info("Not operator namespace - Skipping")
 
 		return reconcile.Result{}, nil

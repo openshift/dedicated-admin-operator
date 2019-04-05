@@ -17,7 +17,7 @@ package metrics
 import (
 	"net/http"
 
-	"github.com/openshift/dedicated-admin-operator/config"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -49,7 +49,7 @@ func RegisterMetrics() error {
 
 // IncEventGauge will increment a gauge and set appropriate labels.
 func incEventGauge(gauge *prometheus.GaugeVec) {
-	gauge.With(prometheus.Labels{"name": config.OperatorName}).Inc()
+	gauge.With(prometheus.Labels{"name": operatorconfig.OperatorName}).Inc()
 }
 
 // UpdateBlacklistedGauge sets the gauge metric with the number of blacklisted projects
