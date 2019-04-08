@@ -17,7 +17,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
+	dedicatedadminproject "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/project"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -30,7 +31,7 @@ import (
 
 func reset(ctx context.Context, r *ReconcileRolebinding) {
 	r.client.Delete(ctx, makeConfig())
-	for _, rb := range dedicatedadmin.Rolebindings {
+	for _, rb := range dedicatedadminproject.RoleBindings {
 		r.client.Delete(ctx, rb.DeepCopyObject())
 	}
 	r.client.Delete(ctx, makeNamespace("test"))
@@ -40,27 +41,6 @@ func makeTestReconciler() *ReconcileRolebinding {
 	return &ReconcileRolebinding{
 		client: client.NewFakeClient(),
 		scheme: nil,
-	}
-}
-
-func TestMissingConfigMap(t *testing.T) {
-	ctx := context.TODO()
-	reconciler := makeTestReconciler()
-	defer reset(ctx, reconciler)
-
-	request := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      "test-name",
-			Namespace: "test-ns",
-		},
-	}
-
-	res, err := reconciler.Reconcile(request)
-	if !res.Requeue {
-		t.Error("Expected to be told to requeue because there's no configmap, but we weren't")
-	}
-	if err == nil {
-		t.Error("Expected an error because there's no configmap, but didn't get one")
 	}
 }
 
@@ -119,7 +99,7 @@ func TestCreatesRoleBindingInCorrectNS(t *testing.T) {
 	}
 	rbname := ""
 	// just need one key
-	for rbn := range dedicatedadmin.Rolebindings {
+	for rbn := range dedicatedadminproject.RoleBindings {
 		rbname = rbn
 		break
 	}
@@ -189,8 +169,8 @@ func makeNamespace(ns string) *corev1.Namespace {
 func makeConfig() *corev1.ConfigMap {
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "dedicated-admin-operator-config",
-			Namespace: "openshift-dedicated-admin",
+			Name:      operatorconfig.OperatorConfigMapName,
+			Namespace: operatorconfig.OperatorNamespace,
 		},
 		Data: map[string]string{
 			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",

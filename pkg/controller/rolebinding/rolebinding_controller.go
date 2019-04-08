@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
+	dedicatedadminproject "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/project"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -107,7 +108,7 @@ func (r *ReconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 			// The RoleBinding was deleted
 
 			// Check if the RB being deleted is from Dedicated Admin
-			missingRB, isDedicatedAdminRB := dedicatedadmin.Rolebindings[request.Name]
+			missingRB, isDedicatedAdminRB := dedicatedadminproject.RoleBindings[request.Name]
 			if isDedicatedAdminRB {
 				reqLogger.Info("Restoring RoleBinding", "Namespace", request.Namespace)
 

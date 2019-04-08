@@ -19,17 +19,20 @@ import (
 	"flag"
 
 	"fmt"
-	"os"
-	"runtime"
+	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
+	"github.com/openshift/dedicated-admin-operator/pkg/apis"
+	"github.com/openshift/dedicated-admin-operator/pkg/controller"
+	"github.com/openshift/dedicated-admin-operator/pkg/metrics"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
-	"github.com/openshift/dedicated-admin-operator/pkg/apis"
-	"github.com/openshift/dedicated-admin-operator/pkg/controller"
 	"github.com/spf13/pflag"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"os"
+	"runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -75,7 +78,7 @@ func main() {
 	ctx := context.TODO()
 
 	// Become the leader before proceeding
-	err = leader.Become(ctx, "dedicated-admin-operator-lock")
+	err = leader.Become(ctx, operatorconfig.OperatorName+"-lock")
 	if err != nil {
 		log.Error(err, "")
 		os.Exit(1)
@@ -99,11 +102,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := monitoringv1.AddToScheme(mgr.GetScheme()); err != nil {
+		log.Error(err, "")
+		os.Exit(1)
+	}
+
 	// Setup all Controllers
 	if err := controller.AddToManager(mgr); err != nil {
 		log.Error(err, "")
 		os.Exit(1)
 	}
+
+	log.Info("Starting Metrics.")
+
+	metrics.StartMetrics()
 
 	log.Info("Starting the Cmd.")
 

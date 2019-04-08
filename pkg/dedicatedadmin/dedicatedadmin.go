@@ -19,9 +19,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/openshift/dedicated-admin-operator/config"
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/types"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
@@ -44,15 +44,13 @@ func IsBlackListedNamespace(namespace string, blacklistedNamespaces string) bool
 
 // GetOperatorConfig gets the operator's configuration from a config map
 func GetOperatorConfig(ctx context.Context, k8sClient client.Client) (*corev1.ConfigMap, error) {
-	var configMap types.NamespacedName
-
-	configMap.Name = config.OperatorConfigMapName
-	configMap.Namespace = config.OperatorNamespace
-	// daLogger.Info("GetOperatorConfig", "ConfigMap Get Request", configMap)
-
-	// Load config map with operator's config
-	operatorConfig := &corev1.ConfigMap{}
-	err := k8sClient.Get(ctx, configMap, operatorConfig)
-
-	return operatorConfig, err
+	return &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      operatorconfig.OperatorConfigMapName,
+			Namespace: operatorconfig.OperatorNamespace,
+		},
+		Data: map[string]string{
+			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",
+		},
+	}, nil
 }

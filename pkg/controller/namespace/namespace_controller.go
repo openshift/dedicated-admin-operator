@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
+	dedicatedadminproject "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/project"
 	"github.com/openshift/dedicated-admin-operator/pkg/metrics"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -58,8 +59,6 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	if err != nil {
 		return err
 	}
-
-	metrics.StartMetrics()
 
 	// Watch for changes to primary resource Project
 	err = c.Watch(&source.Kind{Type: &corev1.Namespace{}}, &handler.EnqueueRequestForObject{})
@@ -137,7 +136,7 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		return reconcile.Result{}, nil
 	}
 	// Loop thru our map of rolebindings, adding each one to the namespace
-	for _, rb := range dedicatedadmin.Rolebindings {
+	for _, rb := range dedicatedadminproject.RoleBindings {
 		reqLogger.Info("Assigning RoleBinding to Namespace", "RoleBinding", rb.Name)
 
 		// Add namespace parameter to rolebinding

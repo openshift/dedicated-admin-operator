@@ -2,8 +2,10 @@ package namespace
 
 import (
 	"context"
-	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
+	dedicatedadminproject "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/project"
 	"testing"
+
+	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -25,27 +27,6 @@ func newTestReconciler() *ReconcileNamespace {
 	return &ReconcileNamespace{
 		client: client.NewFakeClient(),
 		scheme: nil,
-	}
-}
-
-func TestMissingConfigMap(t *testing.T) {
-	ctx := context.TODO()
-
-	reconciler := newTestReconciler()
-	defer reset(ctx, reconciler)
-
-	request := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      "test-name",
-			Namespace: "test-ns",
-		},
-	}
-	res, err := reconciler.Reconcile(request)
-	if !res.Requeue {
-		t.Error("Expected to be told to requeue because there's no configmap, but we weren't")
-	}
-	if err == nil {
-		t.Error("Expected an error because there's no configmap, but didn't get one")
 	}
 }
 
@@ -112,9 +93,9 @@ func TestUnBlockedNamespace(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while trying to list RBAC entries: %s", err)
 	}
-	// we have some RoleBindings in dedicatedadmin.Rolebindings, so let's make sure we have them here, too
+	// we have some RoleBindings in dedicatedadminproject.RoleBindings, so let's make sure we have them here, too
 	seen := make(map[string]bool)
-	for _, rb := range dedicatedadmin.Rolebindings {
+	for _, rb := range dedicatedadminproject.RoleBindings {
 		seen[rb.ObjectMeta.Name] = false
 	}
 	for _, rb := range list.Items {
@@ -136,8 +117,8 @@ func makeNamespace(ns string) *corev1.Namespace {
 func makeConfig() *corev1.ConfigMap {
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "dedicated-admin-operator-config",
-			Namespace: "openshift-dedicated-admin",
+			Name:      operatorconfig.OperatorConfigMapName,
+			Namespace: operatorconfig.OperatorNamespace,
 		},
 		Data: map[string]string{
 			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",
