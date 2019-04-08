@@ -83,8 +83,7 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 	// Initialize logging obj
 	reqLogger := log.WithValues("Request.Namespace", request.Name)
 
-	// Check if the namespace is black listed - administrative namespaces where we
-	// don't want to add the dedicated-admin rolebinding, e. g kube-system, openshift-logging
+	// Check if the namespace is the operator namespace.  If not, skip.
 	if request.Name != operatorconfig.OperatorNamespace {
 		reqLogger.Info("Not operator namespace - Skipping")
 
@@ -104,13 +103,6 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		// Error reading the obj
 		reqLogger.Info("Error Getting Namespace")
 		return reconcile.Result{}, err
-	}
-
-	// Namespace is being deleted
-	if ns.Status.Phase == corev1.NamespaceTerminating {
-		reqLogger.Info("Namespace Being Deleted")
-
-		return reconcile.Result{}, nil
 	}
 
 	// Loop thru our resources and add to the namespace
