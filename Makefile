@@ -49,8 +49,12 @@ default: gobuild
 clean:
 	rm -rf ./build/_output
 
+.PHONY: isclean 
+isclean:
+	(test "$(ALLOW_DIRTY_CHECKOUT)" != "false" || test 0 -eq $$(git status --porcelain | wc -l)) || (echo "Local git checkout is not clean, commit changes and try again." && exit 1)
+
 .PHONY: build
-build: 
+build: isclean
 	docker build . -f build/ci-operator/Dockerfile -t $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
 
 .PHONY: push
@@ -71,7 +75,7 @@ gotest:
 	go test $(TESTOPTS) $(TESTTARGETS)
 
 .PHONY: env
-env: 
+env: isclean
 	@echo OPERATOR_NAME=$(OPERATOR_NAME)
 	@echo OPERATOR_NAMESPACE=$(OPERATOR_NAMESPACE)
 	@echo OPERATOR_VERSION=$(VERSION_FULL)
