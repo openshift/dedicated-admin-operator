@@ -47,8 +47,18 @@ default: gobuild
 clean:
 	rm -rf ./build/_output
 
+.PHONY: isclean 
+isclean:
+	@# verify there are no local changes
+	@# this is because version is based on number of commits and git hash
+	@if [ ! -z "$$(git status --porcelain)" ]; then \
+		echo "Local git checkout is not clean."; \
+		echo "Commit all changes and try again."; \
+		exit 1; \
+	fi
+
 .PHONY: build
-build:
+build: isclean
 	docker build . -f build/ci-operator/Dockerfile -t $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
 
 .PHONY: push
@@ -69,7 +79,7 @@ gotest:
 	go test $(TESTOPTS) $(TESTTARGETS)
 
 .PHONY: env
-env:
+env: isclean
 	@echo OPERATOR_NAME=$(OPERATOR_NAME)
 	@echo OPERATOR_NAMESPACE=$(OPERATOR_NAMESPACE)
 	@echo OPERATOR_VERSION=$(VERSION_FULL)
