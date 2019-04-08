@@ -41,6 +41,8 @@ TESTTARGETS := $(shell go list -e ./... | egrep -v "/(vendor)/")
 # ex, -v
 TESTOPTS := 
 
+ALLOW_DIRTY_CHECKOUT?=false
+
 default: gobuild
 
 .PHONY: clean
@@ -51,7 +53,7 @@ clean:
 isclean:
 	@# verify there are no local changes
 	@# this is because version is based on number of commits and git hash
-	@if [ ! -z "$$(git status --porcelain)" ]; then \
+	@if [ "${ALLOW_DIRTY_CHECKOUT}" == "false" ] && [ ! -z "$$(git status --porcelain)" ]; then \
 		echo "Local git checkout is not clean."; \
 		echo "Commit all changes and try again."; \
 		exit 1; \
