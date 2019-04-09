@@ -21,7 +21,6 @@ import (
 	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	dedicatedadminoperator "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/operator"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -90,31 +89,7 @@ func TestValidNamespace(t *testing.T) {
 		t.Errorf("Expected no error, but got one: %s", err)
 	}
 
-	// check resources: clusterrolebindings, services, servicemonitors
-
-	// clusterrolebindings:
-	{
-		list := rbacv1.ClusterRoleBindingList{}
-		opts := realclient.ListOptions{Namespace: request.Name}
-
-		err = reconciler.client.List(ctx, &opts, &list)
-		if err != nil {
-			t.Errorf("Error listing %s: %s", "ClusterRoleBindings", err)
-		}
-
-		seen := make(map[string]bool)
-		for _, obj := range dedicatedadminoperator.ClusterRoleBindings {
-			seen[obj.ObjectMeta.Name] = false
-		}
-		for _, obj := range list.Items {
-			seen[obj.ObjectMeta.Name] = true
-		}
-		for obj_name, s := range seen {
-			if !s {
-				t.Errorf("Expected but didn't see %s: %s", "ClusterRoleBinding", obj_name)
-			}
-		}
-	}
+	// check resources: services, servicemonitors
 
 	// services:
 	{
