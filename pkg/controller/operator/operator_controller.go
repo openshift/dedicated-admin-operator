@@ -106,21 +106,6 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 	}
 
 	// Loop thru our resources and add to the namespace
-	for _, obj := range dedicatedadminoperator.ClusterRoleBindings {
-		reqLogger.Info("Assigning ClusterRoleBinding to Operator Namespace", "ClusterRoleBinding", obj.Name)
-
-		// Add namespace parameter to resource
-		obj.Namespace = request.Name
-
-		err = r.client.Create(ctx, &obj)
-
-		// check for errors, but ignore when resource already exists
-		if err != nil && !errors.IsAlreadyExists(err) {
-			reqLogger.Info("Error creating ClusterRoleBinding", "ClusterRoleBinding", obj.Name, "Error", err)
-			return reconcile.Result{}, err
-		}
-	}
-
 	for _, obj := range dedicatedadminoperator.Services {
 		reqLogger.Info("Assigning Service to Operator Namespace", "Service", obj.Name)
 

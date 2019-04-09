@@ -1,17 +1,14 @@
-kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
 metadata:
   name: dedicated-admin-operator
 rules:
 - apiGroups:
-  - ""
+  - monitoring.coreos.com
   resources:
-  - "*"
+  - servicemonitors
   verbs:
-  - "*"
-- apiGroups:
-  - "*"
-  resources:
-  - "*"
-  verbs:
-  - "*"
+  - create
+  - get
+  - list
+  - watch

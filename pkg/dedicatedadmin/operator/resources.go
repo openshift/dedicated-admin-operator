@@ -18,28 +18,8 @@ import (
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	operatorconfig "github.com/openshift/dedicated-admin-operator/config"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-var ClusterRoleBindings = map[string]rbacv1.ClusterRoleBinding{
-	"dedicated-admins-cluster": {
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "dedicated-admins-cluster",
-		},
-		Subjects: []rbacv1.Subject{
-			{
-				Kind: "Group",
-				Name: "dedicated-admins",
-			},
-		},
-		RoleRef: rbacv1.RoleRef{
-			APIGroup: "rbac.authorization.k8s.io",
-			Kind:     "ClusterRole",
-			Name:     "dedicated-admins-cluster",
-		},
-	},
-}
 
 var Services = map[string]corev1.Service{
 	"dedicated-admin-operator": {

@@ -1,8 +1,7 @@
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: dedicated-admin-operator
+  name: dedicated-admin-operator-admin
 subjects:
 - kind: ServiceAccount
   name: dedicated-admin-operator
@@ -10,4 +9,4 @@ subjects:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: dedicated-admin-operator
+  name: admin
