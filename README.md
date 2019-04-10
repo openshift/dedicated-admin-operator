@@ -81,3 +81,4 @@ OLM currently cannot support creation of arbitrary resources when an operator is
 Note the creation of `ClusterRoleBindings` is possible via a `ClusterServiceVersion` CR, used to deploy an operator.  But it can only have a `ServiceAccount` as the subject.  At this time you cannot create a `ClusterRoleBinding` to other subjects in a `ClusterServiceVersion`.
 
 Create resources in the operator's `Namespace`
+
