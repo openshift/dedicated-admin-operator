@@ -32,6 +32,8 @@ BUILD_DATE=$(shell date -u +%Y-%m-%d)
 CURRENT_COMMIT=$(shell git rev-parse --short=8 HEAD)
 VERSION_FULL=$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(BUILD_DATE)-$(CURRENT_COMMIT)
 
+OPERATOR_IMAGE_URI=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
+
 BINFILE=build/_output/bin/$(OPERATOR_NAME)
 MAINPACKAGE=./cmd/manager
 GOENV=GOOS=linux GOARCH=amd64 CGO_ENABLED=0
@@ -55,11 +57,11 @@ isclean:
 
 .PHONY: build
 build: isclean envtest
-	docker build . -f build/ci-operator/Dockerfile -t $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
+	docker build . -f build/ci-operator/Dockerfile -t $(OPERATOR_IMAGE_URI)
 
 .PHONY: push
 push: build
-	docker push $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
+	docker push $(OPERATOR_IMAGE_URI)
 
 .PHONY: gocheck
 gocheck: ## Lint code
@@ -83,7 +85,9 @@ envtest:
 test: envtest gotest
 
 .PHONY: env
+.SILENT: env
 env: isclean
-	@echo OPERATOR_NAME=$(OPERATOR_NAME)
-	@echo OPERATOR_NAMESPACE=$(OPERATOR_NAMESPACE)
-	@echo OPERATOR_VERSION=$(VERSION_FULL)
+	echo OPERATOR_NAME=$(OPERATOR_NAME)
+	echo OPERATOR_NAMESPACE=$(OPERATOR_NAMESPACE)
+	echo OPERATOR_VERSION=$(VERSION_FULL)
+	echo OPERATOR_IMAGE_URI=$(OPERATOR_IMAGE_URI)
