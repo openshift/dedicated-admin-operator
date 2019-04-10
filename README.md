@@ -20,3 +20,4 @@ The Dockerfile provided (in `build/Dockerfile`) takes advantage of the multi-sta
 ```
 docker build -f build/Dockerfile . -t openshift/dedicated-admin-operator:latest
 ``` 
+
