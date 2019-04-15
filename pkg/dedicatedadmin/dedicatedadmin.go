@@ -50,7 +50,7 @@ func GetOperatorConfig(ctx context.Context, k8sClient client.Client) (*corev1.Co
 			Namespace: operatorconfig.OperatorNamespace,
 		},
 		Data: map[string]string{
-			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",
+			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$,^ops-health-monitoring$,^ops-project-operation-check$,^management-infra$",
 		},
 	}, nil
 }
