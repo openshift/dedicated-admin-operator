@@ -1,4 +1,3 @@
-# Standard set of Makefile targets for OSD Operators
 # Validate variables in project.mk exist
 ifndef IMAGE_REGISTRY
 $(error IMAGE_REGISTRY is not set; check project.mk file)
@@ -18,11 +17,11 @@ endif
 
 # Generate version and tag information from inputs
 COMMIT_NUMBER=$(shell git rev-list `git rev-list --parents HEAD | egrep "^[a-f0-9]{40}$$"`..HEAD --count)
-BUILD_DATE=$(shell date -u +%Y-%m-%d)
 CURRENT_COMMIT=$(shell git rev-parse --short=8 HEAD)
-VERSION_FULL=$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(BUILD_DATE)-$(CURRENT_COMMIT)
+OPERATOR_VERSION=$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(CURRENT_COMMIT)
 
-OPERATOR_IMAGE_URI=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(VERSION_FULL)
+OPERATOR_IMAGE_URI=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(OPERATOR_VERSION)
+OPERATOR_IMAGE_URI_LATEST=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):latest
 
 BINFILE=build/_output/bin/$(OPERATOR_NAME)
 MAINPACKAGE=./cmd/manager
@@ -35,18 +34,25 @@ TESTOPTS :=
 
 ALLOW_DIRTY_CHECKOUT?=false
 
-.SILENT: isclean
+default: gobuild
+
+.PHONY: clean
+clean:
+	rm -rf ./build/_output
+
 .PHONY: isclean 
 isclean:
-	(test "$(ALLOW_DIRTY_CHECKOUT)" != "false" || test 0 -eq $$(git status --porcelain | wc -l)) || (echo "Local git checkout is not clean, commit changes and try again." && exit 1)
+	@(test "$(ALLOW_DIRTY_CHECKOUT)" != "false" || test 0 -eq $$(git status --porcelain | wc -l)) || (echo "Local git checkout is not clean, commit changes and try again." && exit 1)
 
 .PHONY: build
 build: isclean envtest
 	docker build . -f build/ci-operator/Dockerfile -t $(OPERATOR_IMAGE_URI)
+	docker tag $(OPERATOR_IMAGE_URI) $(OPERATOR_IMAGE_URI_LATEST)
 
 .PHONY: push
-push: build
+push:
 	docker push $(OPERATOR_IMAGE_URI)
+	docker push $(OPERATOR_IMAGE_URI_LATEST)
 
 .PHONY: gocheck
 gocheck: ## Lint code
@@ -61,13 +67,13 @@ gobuild: gocheck gotest ## Build binary
 gotest:
 	go test $(TESTOPTS) $(TESTTARGETS)
 
-.PHONY: test
-test: envtest gotest
-
 .PHONY: envtest
 envtest:
 	@# test that the env target can be evaluated, required by osd-operators-registry
 	@eval $$($(MAKE) env --no-print-directory) || (echo 'Unable to evaulate output of `make env`.  This breaks osd-operators-registry.' && exit 1)
+
+.PHONY: test
+test: envtest gotest
 
 .PHONY: env
 .SILENT: env
@@ -76,8 +82,3 @@ env: isclean
 	echo OPERATOR_NAMESPACE=$(OPERATOR_NAMESPACE)
 	echo OPERATOR_VERSION=$(VERSION_FULL)
 	echo OPERATOR_IMAGE_URI=$(OPERATOR_IMAGE_URI)
-
-.PHONY: clean
-clean:
-	rm -rf ./build/_output
-
