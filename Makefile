@@ -32,6 +32,7 @@ CURRENT_COMMIT=$(shell git rev-parse --short=8 HEAD)
 OPERATOR_VERSION=$(VERSION_MAJOR).$(VERSION_MINOR).$(COMMIT_NUMBER)-$(CURRENT_COMMIT)
 
 OPERATOR_IMAGE_URI=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):v$(OPERATOR_VERSION)
+OPERATOR_IMAGE_URI_LATEST=$(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY)/$(IMAGE_NAME):latest
 
 BINFILE=build/_output/bin/$(OPERATOR_NAME)
 MAINPACKAGE=./cmd/manager
@@ -57,10 +58,12 @@ isclean:
 .PHONY: build
 build: isclean envtest
 	docker build . -f build/ci-operator/Dockerfile -t $(OPERATOR_IMAGE_URI)
+	docker tag $(OPERATOR_IMAGE_URI) $(OPERATOR_IMAGE_URI_LATEST)
 
 .PHONY: push
-push: build
+push:
 	docker push $(OPERATOR_IMAGE_URI)
+	docker push $(OPERATOR_IMAGE_URI_LATEST)
 
 .PHONY: gocheck
 gocheck: ## Lint code
