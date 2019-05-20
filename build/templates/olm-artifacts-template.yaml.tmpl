@@ -40,29 +40,29 @@ objects:
         publisher: Red Hat
         sourceType: grpc
     - apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: openshift-dedicated-admin
-          annotations:
-            openshift.io/node-selector: ""
-          labels:
-            openshift.io/cluster-monitoring: "true"
+      kind: Namespace
+      metadata:
+        name: openshift-dedicated-admin
+        annotations:
+          openshift.io/node-selector: ""
+        labels:
+          openshift.io/cluster-monitoring: "true"
     - apiVersion: operators.coreos.com/v1alpha2
-        kind: OperatorGroup
-        metadata:
-          name: dedicated-admin-operator
-          namespace: openshift-dedicated-admin
-        spec:
-          targetNamespaces:
-          - openshift-dedicated-admin
+      kind: OperatorGroup
+      metadata:
+        name: dedicated-admin-operator
+        namespace: openshift-dedicated-admin
+      spec:
+        targetNamespaces:
+        - openshift-dedicated-admin
     - apiVersion: operators.coreos.com/v1alpha1
-        kind: Subscription
-        metadata:
-          name: dedicated-admin-operator
-          namespace: openshift-dedicated-admin
-        spec:
-          channel: ${CHANNEL}
-          name: dedicated-admin-operator
-          source: dedicated-admin-operator-registry
-          sourceNamespace: openshift-operator-lifecycle-manager
+      kind: Subscription
+      metadata:
+        name: dedicated-admin-operator
+        namespace: openshift-dedicated-admin
+      spec:
+        channel: ${CHANNEL}
+        name: dedicated-admin-operator
+        source: dedicated-admin-operator-registry
+        sourceNamespace: openshift-operator-lifecycle-manager
   
