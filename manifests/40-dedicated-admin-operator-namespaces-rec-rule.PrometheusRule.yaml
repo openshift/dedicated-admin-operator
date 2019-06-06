@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: sre-dedicated-admin-alerts
+  name: sre-dedicated-admin-alerts
+  namespace: openshift-monitoring
+spec:
+  groups:
+  - name: sre-dedicated-admin-alerts
+    rules:
+    - record: DedicatedAdminDesiredBlackList:count
+      expr: |
+        count(kube_namespace_created{namespace =~ "^(kube|openshift)-.*"}) + 
+        count(kube_namespace_created{namespace =~ "^(logging|default|openshift|ops-health-monitoring|ops-project-operation-check|management-infra)$"})
+    - alert: DedicatedAdminBlackListMismatch5Min
+      expr: "dedicated_admin_blacklisted_projects != DedicatedAdminDesiredBlackList:count"
+      for: 5m
+      annotations:
+        message: "The number of projects blacklisted by dedicated-admin-operator does not match the expected regular expression"
+      labels:
+        severity: critical
