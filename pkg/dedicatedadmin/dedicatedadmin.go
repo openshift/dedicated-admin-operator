@@ -51,7 +51,7 @@ func GetOperatorConfig(ctx context.Context, k8sClient client.Client) (*corev1.Co
 		},
 		// Always update the PrometheusRule when updating this regexp, reflecting the same changes on the expr for the alert rule
 		Data: map[string]string{
-			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$,^ops-health-monitoring$,^ops-project-operation-check$,^management-infra$",
+			"project_blacklist": operatorconfig.BlacklistRegex,
 		},
 	}, nil
 }
