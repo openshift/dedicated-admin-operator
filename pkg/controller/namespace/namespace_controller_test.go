@@ -121,7 +121,7 @@ func makeConfig() *corev1.ConfigMap {
 			Namespace: operatorconfig.OperatorNamespace,
 		},
 		Data: map[string]string{
-			"project_blacklist": "^kube-.*,^openshift-.*,^logging$,^default$,^openshift$",
+			"project_blacklist": operatorconfig.BlacklistRegex,
 		},
 	}
 }
