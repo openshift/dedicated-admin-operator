@@ -8,5 +8,5 @@ subjects:
   name: dedicated-admins
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: ClusterRole
   name: dedicated-admins-logging
