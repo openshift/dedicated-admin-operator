@@ -87,3 +87,91 @@ objects:
               message: "The number of projects blacklisted by dedicated-admin-operator does not match the expected regular expression"
             labels:
               severity: critical
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: openshift-logging
+        annotations:
+          openshift.io/node-selector: "" 
+        labels:
+          openshift.io/cluster-logging: "true"
+          openshift.io/cluster-monitoring: "true"
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: dedicated-admins-logging
+        namespace: openshift-logging
+      rules:
+      - apiGroups:
+        - ""
+        resources:
+        - namespaces
+        - pods
+        - pods/log
+        verbs:
+        - list
+        - get
+        - watch
+      - apiGroups:
+        - logging.openshift.io
+        resources:
+        - clusterloggings
+        verbs:
+        - create
+        - delete
+        - deletecollection
+        - get
+        - list
+        - patch
+        - update
+        - watch
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: dedicated-admins-logging
+        namespace: openshift-logging
+      subjects:
+      - kind: Group
+        name: dedicated-admins
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: dedicated-admins-logging
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: dedicated-admins-cluster-monitoring-view
+        namespace: openshift-monitoring
+      roleRef:
+        kind: ClusterRole
+        name:  cluster-monitoring-view
+      subjects:
+      - kind: Group
+        name: dedicated-admins
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: dedicated-admins-cluster-monitoring-routes
+        namespace: openshift-monitoring
+      rules:
+      - apiGroups:
+        - route.openshift.io
+        resources: 
+        - routes
+        verbs:
+        - get
+        - list
+        - watch
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: dedicated-admins-cluster-monitoring-routes
+        namespace: openshift-monitoring
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: dedicated-admins-cluster-monitoring-routes
+      subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: dedicated-admins

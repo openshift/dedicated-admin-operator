@@ -90,6 +90,9 @@ if __name__ == '__main__':
             with open(file_path) as stream:
                 yaml_file = yaml.safe_load_all(stream)
                 for obj in yaml_file:
+                    # skip if it's not deployed in the operator's namespace (TODO automate building the template!!!)
+                    if 'namespace' in obj['metadata'] and obj['metadata']['namespace'] != operator_namespace:
+                        continue
                     if obj['kind'] == 'ClusterRole' and any(obj['metadata']['name'] in cr for cr in clusterrole_names_csv):
                         print('Adding ClusterRole to CSV: {}'.format(file_path))
                         csv['spec']['install']['spec']['clusterPermissions'].append(
