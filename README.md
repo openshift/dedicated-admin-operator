@@ -16,7 +16,19 @@ The Dedicated Admin Operator exposes the following Prometheus metrics:
 
 * dedicated_admin_blacklisted: gauge of blacklisted namespaces
 
+## On OLM and Bundling
+
+OLM can deploy a resource that is bundled in a CatalogSource. But OLM won't update it. And OLM won't delete it if it's removed in a future version of the CatalogSource. There are two other options for managing these resources. 1) controller in the operator code or 2) manage it externally. Option #1 is a lot of work, though it does cover the cases where a resource is deleted. Option #2 is less work but has a gap in that fixing a broken config requires external action.
+
+In July 2019 a PR switched to option #2, relying on Hive to manage the resources via SelectorSyncSet. Hive will fix anything that breaks within 2 hours or a human can force it to sync by removing the related SyncSetInstance CR. It means no go code to manage the resources and a simpler deployment. This means ALL resources move out of the bundle.
+
+We can go back to bundling in the future when OLM will manage bundled resources. It's causing pain now. Hive will reconcile resources moving forward.
+
 # Building
+
+## Dependencies
+
+- oyaml: `pip install oyaml`
 
 ## Makefile
 
