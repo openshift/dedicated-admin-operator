@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dedicated-admins-cluster-monitoring-routes
+  namespace: openshift-monitoring
+rules:
+- apiGroups:
+  - route.openshift.io
+  resources: 
+  - routes
+  verbs:
+  - get
+  - list
+  - watch

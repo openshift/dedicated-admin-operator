@@ -1,7 +1,8 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: dedicated-admin-cluster-monitoring-view
+  name: dedicated-admins-cluster-monitoring-view
+  namespace: openshift-monitoring
 roleRef:
   kind: ClusterRole
   name:  cluster-monitoring-view
