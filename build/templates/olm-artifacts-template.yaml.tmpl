@@ -1,6 +1,10 @@
 apiVersion: v1
 kind: Template
 parameters:
+- name: REGISTRY_IMG
+  required: true
+- name: CHANNEL
+  required: true
 - name: IMAGE_TAG
   required: true
 - name: REPO_NAME
@@ -427,3 +431,29 @@ objects:
                 does not match the expected regular expression
             labels:
               severity: critical
+    - apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      metadata:
+        labels:
+          opsrc-datastore: 'true'
+          opsrc-provider: redhat
+        name: dedicated-admin-operator-registry
+        namespace: openshift-operator-lifecycle-manager
+      spec:
+        image: ${REGISTRY_IMG}:${CHANNEL}-${IMAGE_TAG}
+        displayName: Dedicated Admin Operator
+        icon:
+          base64data: ''
+          mediatype: ''
+        publisher: Red Hat
+        sourceType: grpc
+    - apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: dedicated-admin-operator
+        namespace: openshift-dedicated-admin
+      spec:
+        channel: ${CHANNEL}
+        name: dedicated-admin-operator
+        source: dedicated-admin-operator-registry
+        sourceNamespace: openshift-operator-lifecycle-manager

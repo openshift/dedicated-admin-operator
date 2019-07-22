@@ -1,0 +1,16 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  labels:
+    opsrc-datastore: "true"
+    opsrc-provider: redhat
+  name: dedicated-admin-operator-registry
+  namespace: openshift-operator-lifecycle-manager
+spec:
+  image: ${REGISTRY_IMG}:${CHANNEL}-${IMAGE_TAG}
+  displayName: Dedicated Admin Operator
+  icon:
+    base64data: ""
+    mediatype: ""
+  publisher: Red Hat
+  sourceType: grpc
