@@ -102,3 +102,55 @@ rules:
   - get
   - list
   - update
+### BEGIN - customer can use monitoring web applications
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+### END - customer can use monitoring web applications
+### BEGIN - customer can see project status (nice UX from use monitoring web applications)
+- apiGroups:
+  - build.openshift.io
+  resources:
+  - builds
+  - buildconfigs
+  verbs:
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - list
+- apiGroups:
+  - apps.openshift.io
+  resources:
+  - deploymentconfigs
+  verbs:
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - replicationcontrollers
+  - services
+  verbs:
+  - list
+- apiGroups:
+  - project.openshift.io
+  resources:
+  - projects
+  verbs:
+  - get
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - list
+### END - customer can see project status (nice UX from use monitoring web applications)

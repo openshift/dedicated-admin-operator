@@ -90,7 +90,7 @@ if __name__ == '__main__':
             with open(file_path) as stream:
                 yaml_file = yaml.safe_load_all(stream)
                 for obj in yaml_file:
-                    # skip if it's not deployed in the operator's namespace (TODO automate building the template!!!)
+                    # only add to csv, don't bundle anything anymore.. hive will handle it
                     if 'namespace' in obj['metadata'] and obj['metadata']['namespace'] != operator_namespace:
                         continue
                     if obj['kind'] == 'ClusterRole' and any(obj['metadata']['name'] in cr for cr in clusterrole_names_csv):
@@ -104,26 +104,10 @@ if __name__ == '__main__':
                         print('Adding Deployment to CSV: {}'.format(file_path))
                         csv['spec']['install']['spec']['deployments'][0]['spec'] = obj['spec']
                         csv['spec']['install']['spec']['deployments'][0]['name'] = operator_name
-                    if obj['kind'] == 'ClusterRole' or obj['kind'] == 'Role' or obj['kind'] == 'RoleBinding' or obj['kind'] == 'ClusterRoleBinding':
-                        if obj['kind'] in ('RoleBinding', 'ClusterRoleBinding'):
-                            try:
-                                print(obj['roleRef']['kind'])
-                            except KeyError:
-                                # require a well formed roleRef, olm doesn't check this until deployed and InstallPlan fails
-                                print >> sys.stderr, "ERROR {} '{}' is missing .roleRef.kind in file {}".format(obj['kind'], obj['metadata']['name'], file_path)
-                                sys.exit(1)
-
-                        print('Adding {} to Catalog: {}'.format(obj['kind'], file_path))
-                        if 'namespace' in obj['metadata']:
-                            bundle_filename="10-{}.{}.{}.yaml".format(obj['metadata']['namespace'], obj['metadata']['name'], obj['kind']).lower()
-                        else:
-                            bundle_filename="00-{}.{}.yaml".format(obj['metadata']['name'], obj['kind']).lower()
-                        shutil.copyfile(file_path, os.path.join(version_dir, bundle_filename))
 
     if len(csv['spec']['install']['spec']['deployments']) == 0:
         print >> sys.stderr, "ERROR Did not find any Deployments in {}. There is nothing to deploy, so giving up.".format(operator_assets_dir)
         sys.exit(1)
-
 
     # Update the deployment to use the defined image:
     csv['spec']['install']['spec']['deployments'][0]['spec']['template']['spec']['containers'][0]['image'] = operator_image

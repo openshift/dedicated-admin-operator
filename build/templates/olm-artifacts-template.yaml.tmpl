@@ -1,101 +1,311 @@
 apiVersion: v1
 kind: Template
-metadata:
-  name: olm-artifacts-template
 parameters:
-- name: REGISTRY_IMG
-  required: true
-- name: CHANNEL
-  value: staging
-  required: true
 - name: IMAGE_TAG
-  value: latest
   required: true
+- name: REPO_NAME
+  value: dedicated-admin-operator
+  required: true
+metadata:
+  name: selectorsyncset-template
 objects:
 - apiVersion: hive.openshift.io/v1alpha1
   kind: SelectorSyncSet
   metadata:
-    generation: 1
+    labels:
+      managed.openshift.io/gitHash: ${IMAGE_TAG}
+      managed.openshift.io/gitRepoName: ${REPO_NAME}
+      managed.openshift.io/osd: 'true'
     name: dedicated-admin-operator
   spec:
     clusterDeploymentSelector:
       matchLabels:
-        api.openshift.com/managed: "true"
+        api.openshift.com/managed: 'true'
     resourceApplyMode: sync
     resources:
-    - apiVersion: operators.coreos.com/v1alpha1
-      kind: CatalogSource
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
       metadata:
-        labels:
-          opsrc-datastore: "true"
-          opsrc-provider: redhat
-        name: dedicated-admin-operator-registry
-        namespace: openshift-operator-lifecycle-manager
-      spec:
-        image: ${REGISTRY_IMG}:${CHANNEL}-${IMAGE_TAG}
-        displayName: Dedicated Admin Operator
-        icon:
-          base64data: ""
-          mediatype: ""
-        publisher: Red Hat
-        sourceType: grpc
+        annotations:
+          authorization.openshift.io/system-only: 'true'
+        name: dedicated-admins-cluster
+      rules:
+      - apiGroups:
+        - rbac.authorization.k8s.io
+        attributeRestrictions: null
+        resources:
+        - clusterrolebindings
+        verbs:
+        - create
+        - delete
+        - get
+        - list
+        - patch
+        - update
+        - watch
+      - apiGroups:
+        - ''
+        - oauth.openshift.io
+        attributeRestrictions: null
+        resources:
+        - oauthclientauthorizations
+        verbs:
+        - delete
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - authorization.openshift.io
+        attributeRestrictions: null
+        resources:
+        - resourceaccessreviews
+        - subjectaccessreviews
+        verbs:
+        - create
+      - apiGroups:
+        - authorization.k8s.io
+        attributeRestrictions: null
+        resources:
+        - subjectaccessreviews
+        verbs:
+        - create
+      - apiGroups:
+        - ''
+        - project.openshift.io
+        attributeRestrictions: null
+        resources:
+        - projectrequests
+        verbs:
+        - create
+      - apiGroups:
+        - ''
+        attributeRestrictions: null
+        resources:
+        - nodes
+        - persistentvolumes
+        verbs:
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - security.openshift.io
+        attributeRestrictions: null
+        resources:
+        - securitycontextconstraints
+        verbs:
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - quota.openshift.io
+        attributeRestrictions: null
+        resources:
+        - clusterresourcequotas
+        verbs:
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - authorization.openshift.io
+        attributeRestrictions: null
+        resources:
+        - clusterpolicybindings
+        verbs:
+        - get
+        - list
+      - apiGroups:
+        - ''
+        - network.openshift.io
+        attributeRestrictions: null
+        resources:
+        - netnamespaces
+        verbs:
+        - get
+        - list
+        - update
+      - apiGroups:
+        - ''
+        resources:
+        - namespaces
+        verbs:
+        - get
+      - apiGroups:
+        - build.openshift.io
+        resources:
+        - builds
+        - buildconfigs
+        verbs:
+        - list
+      - apiGroups:
+        - apps
+        resources:
+        - daemonsets
+        - deployments
+        - replicasets
+        - statefulsets
+        verbs:
+        - list
+      - apiGroups:
+        - apps.openshift.io
+        resources:
+        - deploymentconfigs
+        verbs:
+        - list
+      - apiGroups:
+        - ''
+        resources:
+        - pods
+        - replicationcontrollers
+        - services
+        verbs:
+        - list
+      - apiGroups:
+        - project.openshift.io
+        resources:
+        - projects
+        verbs:
+        - get
+      - apiGroups:
+        - route.openshift.io
+        resources:
+        - routes
+        verbs:
+        - list
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: dedicated-admins-project
+      rules:
+      - apiGroups:
+        - ''
+        attributeRestrictions: null
+        resources:
+        - limitranges
+        - resourcequotas
+        verbs:
+        - create
+        - delete
+        - get
+        - list
+        - patch
+        - update
+        - watch
+      - apiGroups:
+        - ''
+        - network.openshift.io
+        attributeRestrictions: null
+        resources:
+        - egressnetworkpolicies
+        verbs:
+        - create
+        - delete
+        - get
+        - list
+        - patch
+        - update
+        - watch
+      - apiGroups:
+        - extensions
+        attributeRestrictions: null
+        resources:
+        - daemonsets
+        verbs:
+        - create
+        - delete
+        - get
+        - list
+        - patch
+        - update
+        - watch
+      - apiGroups:
+        - rbac.authorization.k8s.io
+        attributeRestrictions: null
+        resources:
+        - clusterrolebindings
+        - rolebindings
+        verbs:
+        - create
+        - delete
+        - get
+        - list
+        - patch
+        - update
+        - watch
+      - apiGroups:
+        - ''
+        attributeRestrictions: null
+        resources:
+        - events
+        - namespaces
+        - pods
+        verbs:
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - network.openshift.io
+        attributeRestrictions: null
+        resources:
+        - clusternetworks
+        verbs:
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - image.openshift.io
+        attributeRestrictions: null
+        resources:
+        - images
+        - imagestreamtags
+        verbs:
+        - get
+        - list
+        - watch
+      - apiGroups:
+        - ''
+        - build.openshift.io
+        attributeRestrictions: null
+        resources:
+        - buildconfigs
+        - builds
+        verbs:
+        - get
+        - list
+        - watch
     - apiVersion: v1
       kind: Namespace
       metadata:
         name: openshift-dedicated-admin
         annotations:
-          openshift.io/node-selector: ""
+          openshift.io/node-selector: ''
         labels:
-          openshift.io/cluster-monitoring: "true"
-    - apiVersion: operators.coreos.com/v1alpha2
-      kind: OperatorGroup
+          openshift.io/cluster-monitoring: 'true'
+    - apiVersion: authorization.openshift.io/v1
+      kind: ClusterRoleBinding
       metadata:
-        name: dedicated-admin-operator
-        namespace: openshift-dedicated-admin
-      spec:
-        targetNamespaces:
-        - openshift-dedicated-admin
-    - apiVersion: operators.coreos.com/v1alpha1
-      kind: Subscription
-      metadata:
-        name: dedicated-admin-operator
-        namespace: openshift-dedicated-admin
-      spec:
-        channel: ${CHANNEL}
-        name: dedicated-admin-operator
-        source: dedicated-admin-operator-registry
-        sourceNamespace: openshift-operator-lifecycle-manager
-    - apiVersion: monitoring.coreos.com/v1
-      kind: PrometheusRule
-      metadata:
-        labels:
-          prometheus: sre-dedicated-admin-alerts
-        name: sre-dedicated-admin-alerts
-        namespace: openshift-monitoring
-      spec:
-        groups:
-        - name: sre-dedicated-admin-alerts
-          rules:
-          - record: DedicatedAdminDesiredBlackList:count
-            expr: |
-              count(kube_namespace_created{namespace =~ "^(kube|openshift)-.*"}) + 
-              count(kube_namespace_created{namespace =~ "^(logging|default|openshift|ops-health-monitoring|ops-project-operation-check|management-infra)$"})
-          - alert: DedicatedAdminBlackListMismatch5Min
-            expr: "dedicated_admin_blacklisted_projects != DedicatedAdminDesiredBlackList:count"
-            for: 5m
-            annotations:
-              message: "The number of projects blacklisted by dedicated-admin-operator does not match the expected regular expression"
-            labels:
-              severity: critical
+        name: dedicated-admins-cluster
+      subjects:
+      - kind: Group
+        name: dedicated-admins
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: dedicated-admins-cluster
     - apiVersion: v1
       kind: Namespace
       metadata:
         name: openshift-logging
         annotations:
-          openshift.io/node-selector: "" 
+          openshift.io/node-selector: ''
         labels:
-          openshift.io/cluster-logging: "true"
-          openshift.io/cluster-monitoring: "true"
+          openshift.io/cluster-logging: 'true'
+          openshift.io/cluster-monitoring: 'true'
     - apiVersion: rbac.authorization.k8s.io/v1
       kind: Role
       metadata:
@@ -103,7 +313,7 @@ objects:
         namespace: openshift-logging
       rules:
       - apiGroups:
-        - ""
+        - ''
         resources:
         - namespaces
         - pods
@@ -138,26 +348,17 @@ objects:
         kind: Role
         name: dedicated-admins-logging
     - apiVersion: rbac.authorization.k8s.io/v1
-      kind: RoleBinding
-      metadata:
-        name: dedicated-admins-cluster-monitoring-view
-        namespace: openshift-monitoring
-      roleRef:
-        kind: ClusterRole
-        name:  cluster-monitoring-view
-      subjects:
-      - kind: Group
-        name: dedicated-admins
-    - apiVersion: rbac.authorization.k8s.io/v1
       kind: Role
       metadata:
-        name: dedicated-admins-cluster-monitoring-routes
-        namespace: openshift-monitoring
+        name: prometheus-k8s
+        namespace: openshift-dedicated-admin
       rules:
       - apiGroups:
-        - route.openshift.io
-        resources: 
-        - routes
+        - ''
+        resources:
+        - services
+        - endpoints
+        - pods
         verbs:
         - get
         - list
@@ -165,13 +366,64 @@ objects:
     - apiVersion: rbac.authorization.k8s.io/v1
       kind: RoleBinding
       metadata:
-        name: dedicated-admins-cluster-monitoring-routes
-        namespace: openshift-monitoring
+        name: prometheus-k8s
+        namespace: openshift-dedicated-admin
       roleRef:
-        apiGroup: rbac.authorization.k8s.io
         kind: Role
-        name: dedicated-admins-cluster-monitoring-routes
+        name: prometheus-k8s
       subjects:
-      - apiGroup: rbac.authorization.k8s.io
-        kind: Group
-        name: dedicated-admins
+      - kind: ServiceAccount
+        name: prometheus-k8s
+        namespace: openshift-monitoring
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: dedicated-admin-operator
+        namespace: openshift-dedicated-admin
+        labels:
+          k8s-app: dedicated-admin-operator
+      spec:
+        ports:
+        - name: metrics
+          port: 8080
+        selector:
+          k8s-app: dedicated-admin-operator
+        type: ClusterIP
+    - apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        labels:
+          k8s-app: dedicated-admin-operator
+        name: dedicated-admin-operator
+        namespace: openshift-dedicated-admin
+      spec:
+        endpoints:
+        - port: metrics
+          scheme: http
+          interval: 30s
+        selector:
+          matchLabels:
+            k8s-app: dedicated-admin-operator
+    - apiVersion: monitoring.coreos.com/v1
+      kind: PrometheusRule
+      metadata:
+        labels:
+          prometheus: sre-dedicated-admin-alerts
+        name: sre-dedicated-admin-alerts
+        namespace: openshift-monitoring
+      spec:
+        groups:
+        - name: sre-dedicated-admin-alerts
+          rules:
+          - record: DedicatedAdminDesiredBlackList:count
+            expr: "count(kube_namespace_created{namespace =~ \"^(kube|openshift)-.*\"\
+              }) + \ncount(kube_namespace_created{namespace =~ \"^(logging|default|openshift|ops-health-monitoring|ops-project-operation-check|management-infra)$\"\
+              })\n"
+          - alert: DedicatedAdminBlackListMismatch5Min
+            expr: dedicated_admin_blacklisted_projects != DedicatedAdminDesiredBlackList:count
+            for: 5m
+            annotations:
+              message: The number of projects blacklisted by dedicated-admin-operator
+                does not match the expected regular expression
+            labels:
+              severity: critical
