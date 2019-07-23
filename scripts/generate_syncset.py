@@ -63,7 +63,7 @@ def process_yamls(name, directory, obj):
             continue
         if y['kind'] == 'Role' and y['metadata']['name'] in sa_role_names:
             continue
-        if y['kind'] == 'ClusterRoleBinding':
+        if y['kind'] == 'ClusterRoleBinding' or y['kind'] == 'RoleBinding':
             skip = False
             for s in y['subjects']:
                 # if it's for our SA don't process it (is part of CSV)

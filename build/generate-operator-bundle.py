@@ -63,9 +63,11 @@ if __name__ == '__main__':
     csv['spec']['version'] = operator_version
 
     csv['spec']['install']['spec']['clusterPermissions'] = []
+    csv['spec']['install']['spec']['permissions'] = []
 
     SA_NAME = operator_name
     clusterrole_names_csv = []
+    role_names_csv = []
 
     for subdir, dirs, files in os.walk(operator_assets_dir):
         for file in files:
@@ -79,6 +81,10 @@ if __name__ == '__main__':
                         for subject in obj['subjects']:
                             if subject['kind'] == 'ServiceAccount' and subject['name'] == SA_NAME:
                                 clusterrole_names_csv.append(obj['roleRef']['name'])
+                    if obj['kind'] == 'RoleBinding':
+                        for subject in obj['subjects']:
+                            if subject['kind'] == 'ServiceAccount' and subject['name'] == SA_NAME:
+                                role_names_csv.append(obj['roleRef']['name'])
 
     csv['spec']['install']['spec']['deployments'] = []
     csv['spec']['install']['spec']['deployments'].append({'spec':{}})
@@ -96,6 +102,13 @@ if __name__ == '__main__':
                     if obj['kind'] == 'ClusterRole' and any(obj['metadata']['name'] in cr for cr in clusterrole_names_csv):
                         print('Adding ClusterRole to CSV: {}'.format(file_path))
                         csv['spec']['install']['spec']['clusterPermissions'].append(
+                        {
+                            'rules': obj['rules'],
+                            'serviceAccountName': SA_NAME,
+                        })
+                    if obj['kind'] == 'Role' and any(obj['metadata']['name'] in cr for cr in role_names_csv):
+                        print('Adding Role to CSV: {}'.format(file_path))
+                        csv['spec']['install']['spec']['permissions'].append(
                         {
                             'rules': obj['rules'],
                             'serviceAccountName': SA_NAME,
@@ -127,7 +140,7 @@ if __name__ == '__main__':
             found_multi_namespace = True
             break
         i = i + 1
-    
+
     if found_multi_namespace:
         csv['spec']['installModes'][i]['supported'] = multi_namespace
 
