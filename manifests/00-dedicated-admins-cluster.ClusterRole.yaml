@@ -154,3 +154,17 @@ rules:
   verbs:
   - list
 ### END - customer can see project status (nice UX from use monitoring web applications)
+### BEGIN - customer can create verify tokens and access
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+### END - customer can create verify tokens and access
