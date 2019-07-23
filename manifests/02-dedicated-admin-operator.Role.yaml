@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+  name: dedicated-admin-operator
+  namespace: openshift-dedicated-admin
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
