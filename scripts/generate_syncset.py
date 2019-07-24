@@ -58,7 +58,7 @@ def process_yamls(name, directory, obj):
                     sa_role_names.append(y['roleRef']['name'])
 
     for y in yamls:
-        # for an operator skip deployments, SA, and all RBAC related to the SA
+        # for an operator skip deployments, SA, and all RBAC related to the SA (unless we didn't create the ClusterRole)
         if y['kind'] in ('Deployment', 'ServiceAccount'):
             continue
         if y['kind'] == 'Role' and y['metadata']['name'] in sa_role_names:
@@ -67,7 +67,7 @@ def process_yamls(name, directory, obj):
             skip = False
             for s in y['subjects']:
                 # if it's for our SA don't process it (is part of CSV)
-                if s['name'] == sa_name:
+                if s['name'] == sa_name and "dedicated-admin" in y['roleRef']['name']:
                     skip = True
                     break
             if skip:
