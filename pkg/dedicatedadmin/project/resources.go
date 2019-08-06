@@ -30,6 +30,11 @@ var RoleBindings = map[string]rbacv1.RoleBinding{
 				Kind:     "Group",
 				Name:     "dedicated-admins",
 			},
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "system:serviceaccounts:dedicated-admin",
+			},
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: "rbac.authorization.k8s.io",
@@ -46,6 +51,11 @@ var RoleBindings = map[string]rbacv1.RoleBinding{
 				APIGroup: "rbac.authorization.k8s.io",
 				Kind:     "Group",
 				Name:     "dedicated-admins",
+			},
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "system:serviceaccounts:dedicated-admin",
 			},
 		},
 		RoleRef: rbacv1.RoleRef{
