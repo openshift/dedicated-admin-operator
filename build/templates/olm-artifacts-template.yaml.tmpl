@@ -191,6 +191,21 @@ objects:
         - subjectaccessreviews
         verbs:
         - create
+      - apiGroups:
+        - operators.coreos.com
+        - packages.operators.coreos.com
+        resources:
+        - '*'
+        verbs:
+        - list
+        - get
+        - watch
+      - apiGroups:
+        - '*'
+        resources:
+        - packagemanifests
+        verbs:
+        - list
     - apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
       metadata:
@@ -392,17 +407,62 @@ objects:
         - update
         - watch
     - apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: dedicated-admins-openshift-operators
+        namespace: openshift-operators
+      rules:
+      - apiGroups:
+        - operators.coreos.com
+        resources:
+        - subscriptions
+        - clusterserviceversions
+        verbs:
+        - '*'
+    - apiVersion: rbac.authorization.k8s.io/v1
       kind: RoleBinding
       metadata:
-        name: dedicated-admins-logging
-        namespace: openshift-logging
+        name: dedicated-admins-openshift-operators
+        namespace: openshift-operators
       subjects:
       - kind: Group
         name: dedicated-admins
       roleRef:
         apiGroup: rbac.authorization.k8s.io
         kind: Role
-        name: dedicated-admins-logging
+        name: dedicated-admins-openshift-operators
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: dedicated-admins-openshift-marketplace
+        namespace: openshift-marketplace
+      rules:
+      - apiGroups:
+        - operators.coreos.com
+        resources:
+        - catalogsourceconfigs
+        verbs:
+        - '*'
+      - apiGroups:
+        - '*'
+        resources:
+        - packagemanifests
+        verbs:
+        - list
+        - get
+        - watch
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: dedicated-admins-openshift-marketplace
+        namespace: openshift-marketplace
+      subjects:
+      - kind: Group
+        name: dedicated-admins
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: dedicated-admins-openshift-marketplace
     - apiVersion: rbac.authorization.k8s.io/v1
       kind: Role
       metadata:
