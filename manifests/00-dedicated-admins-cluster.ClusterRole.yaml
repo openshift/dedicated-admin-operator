@@ -168,3 +168,20 @@ rules:
   verbs:
   - create
 ### END - customer can create verify tokens and access
+### BEGIN - customer can view OperatorHub in console
+- apiGroups:
+  - operators.coreos.com
+  - packages.operators.coreos.com
+  resources:
+  - "*"
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - '*' # using package.opeartors.coreos.com does not work
+  resources:
+  - packagemanifests
+  verbs:
+  - list
+### END - customer can view OperatorHub in console
