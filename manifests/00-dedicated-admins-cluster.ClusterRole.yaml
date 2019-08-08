@@ -185,3 +185,38 @@ rules:
   verbs:
   - list
 ### END - customer can view OperatorHub in console
+### START - customer can managed CRs for curated operators
+- apiGroups:
+# AMQ Certificate Manager Operator
+  - certificates.certmanager.k8s.io
+  - issuers.certmanager.k8s.io
+  - clusterissuers.certmanager.k8s.io
+  - orders.certmanager.k8s.io
+  - challenges.certmanager.k8s.io
+# Anchore Engine Operator
+  - anchoreengines.anchore.com
+# AtlasMap Operator
+  - atlasmaps.atlasmap.io
+# Camel K Operator
+  - builds.camel.apache.org
+  - camelcatalogs.camel.apache.org
+  - integrations.camel.apache.org
+  - integrationcontexts.camel.apache.org
+  - integrationplatforms.camel.apache.org
+# Couchbase Operator
+  - couchbaseclusters.couchbase.com
+# Open Liberty Operator
+  - openliberties.openliberty.io
+# Opsmx Spinnaker Operator
+  - opsmxspinnakeroperators.charts.helm.k8s.io
+# Seldon Operator
+  - seldondeployments.machinelearning.seldon.io
+# Spinnaker Operator
+  - spinnakeroperators.charts.helm.k8s.io
+# Twistlock Console Operator
+  - twistlockconsoles.charts.helm.k8s.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+### END

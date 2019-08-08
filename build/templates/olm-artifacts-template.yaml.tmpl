@@ -212,6 +212,29 @@ objects:
         - packagemanifests
         verbs:
         - list
+      - apiGroups:
+        - certificates.certmanager.k8s.io
+        - issuers.certmanager.k8s.io
+        - clusterissuers.certmanager.k8s.io
+        - orders.certmanager.k8s.io
+        - challenges.certmanager.k8s.io
+        - anchoreengines.anchore.com
+        - atlasmaps.atlasmap.io
+        - builds.camel.apache.org
+        - camelcatalogs.camel.apache.org
+        - integrations.camel.apache.org
+        - integrationcontexts.camel.apache.org
+        - integrationplatforms.camel.apache.org
+        - couchbaseclusters.couchbase.com
+        - openliberties.openliberty.io
+        - opsmxspinnakeroperators.charts.helm.k8s.io
+        - seldondeployments.machinelearning.seldon.io
+        - spinnakeroperators.charts.helm.k8s.io
+        - twistlockconsoles.charts.helm.k8s.io
+        resources:
+        - '*'
+        verbs:
+        - '*'
     - apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
       metadata:
