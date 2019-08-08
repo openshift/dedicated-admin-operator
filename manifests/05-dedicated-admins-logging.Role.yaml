@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: dedicated-admins-logging
+  name: dedicated-admins-openshift-logging
   namespace: openshift-logging
 rules:
 - apiGroups:
@@ -27,3 +27,10 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - operators.coreos.com
+  resources:
+  - subscriptions
+  - clusterserviceversions
+  verbs:
+  - "*"
