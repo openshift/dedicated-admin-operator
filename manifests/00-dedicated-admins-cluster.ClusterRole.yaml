@@ -153,6 +153,7 @@ rules:
   - routes
   verbs:
   - list
+  - get # https://jira.coreos.com/browse/SREP-1945
 ### END - customer can see project status (nice UX from use monitoring web applications)
 ### BEGIN - customer can create verify tokens and access
 - apiGroups:
