@@ -18,5 +18,5 @@ const (
 	OperatorConfigMapName string = "dedicated-admin-operator-config"
 	OperatorName          string = "dedicated-admin-operator"
 	OperatorNamespace     string = "openshift-dedicated-admin"
-	BlacklistRegex        string = "^kube-.*,^openshift.*,^default$"
+	BlacklistRegex        string = "^kube-.*,^openshift.*,^ops-health-monitoring$,^management-infra$,^default$"
 )
