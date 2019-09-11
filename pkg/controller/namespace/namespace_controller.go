@@ -146,7 +146,6 @@ func (r *ReconcileNamespace) Reconcile(request reconcile.Request) (reconcile.Res
 		// check for errors, but ignore when rolebinding already exists
 		if err != nil && !errors.IsAlreadyExists(err) {
 			reqLogger.Info("Error creating rolebinding", "RoleBinding", rb.Name, "Error", err)
-			return reconcile.Result{}, err
 		}
 	}
 
