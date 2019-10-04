@@ -9,6 +9,7 @@ rules:
   - rbac.authorization.k8s.io
   attributeRestrictions: null
   resources:
+  - clusterroles
   - clusterrolebindings
   verbs:
   - create
