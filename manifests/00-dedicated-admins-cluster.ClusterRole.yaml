@@ -222,3 +222,13 @@ rules:
   verbs:
   - '*'
 ### END
+### START - view ClusterVersion
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - clusterversions
+  verbs:
+  - list
+  - get
+  - watch
+### END
