@@ -5,7 +5,7 @@ metadata:
     opsrc-datastore: "true"
     opsrc-provider: redhat
   name: dedicated-admin-operator-registry
-  namespace: openshift-operator-lifecycle-manager
+  namespace: openshift-dedicated-admin
 spec:
   image: ${REGISTRY_IMG}:${CHANNEL}-${IMAGE_TAG}
   displayName: Dedicated Admin Operator

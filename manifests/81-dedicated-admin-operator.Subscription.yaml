@@ -7,4 +7,4 @@ spec:
   channel: ${CHANNEL}
   name: dedicated-admin-operator
   source: dedicated-admin-operator-registry
-  sourceNamespace: openshift-operator-lifecycle-manager
+  sourceNamespace: openshift-dedicated-admin
