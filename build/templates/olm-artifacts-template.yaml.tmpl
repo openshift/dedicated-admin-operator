@@ -553,7 +553,7 @@ objects:
           opsrc-datastore: 'true'
           opsrc-provider: redhat
         name: dedicated-admin-operator-registry
-        namespace: openshift-operator-lifecycle-manager
+        namespace: openshift-dedicated-admin
       spec:
         image: ${REGISTRY_IMG}:${CHANNEL}-${IMAGE_TAG}
         displayName: Dedicated Admin Operator
@@ -571,7 +571,7 @@ objects:
         channel: ${CHANNEL}
         name: dedicated-admin-operator
         source: dedicated-admin-operator-registry
-        sourceNamespace: openshift-operator-lifecycle-manager
+        sourceNamespace: openshift-dedicated-admin
     - apiVersion: operators.coreos.com/v1alpha2
       kind: OperatorGroup
       metadata:
