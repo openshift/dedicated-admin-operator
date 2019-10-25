@@ -348,6 +348,16 @@ objects:
         - get
         - list
         - watch
+      - apiGroups:
+        - monitoring.coreos.com
+        resources:
+        - prometheus
+        - alertmanager
+        - prometheusrules
+        - servicemonitors
+        - podmonitors
+        verbs:
+        - '*'
     - apiVersion: v1
       kind: Namespace
       metadata:
