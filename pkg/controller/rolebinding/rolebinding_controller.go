@@ -20,9 +20,11 @@ import (
 
 	"github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin"
 	dedicatedadminproject "github.com/openshift/dedicated-admin-operator/pkg/dedicatedadmin/project"
+	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -111,6 +113,22 @@ func (r *ReconcileRolebinding) Reconcile(request reconcile.Request) (reconcile.R
 			missingRB, isDedicatedAdminRB := dedicatedadminproject.RoleBindings[request.Name]
 			if isDedicatedAdminRB {
 				reqLogger.Info("Restoring RoleBinding", "Namespace", request.Namespace)
+
+				ns := &corev1.Namespace{}
+				err = r.client.Get(ctx, types.NamespacedName{Name: request.Namespace}, ns)
+				// if the namespace was not found/has been deleted
+				if err != nil {
+					if errors.IsNotFound(err) {
+						reqLogger.Info("Namespace is Deleted - Skipping")
+						return reconcile.Result{}, nil
+					}
+					return reconcile.Result{}, err
+				}
+				//if the namespace is found but is set for deletion.
+				if ns.Status.Phase == corev1.NamespaceTerminating {
+					reqLogger.Info("Namespace Being Deleted")
+					return reconcile.Result{}, nil
+				}
 
 				missingRB.Namespace = request.Namespace
 				err = r.client.Create(ctx, &missingRB)
