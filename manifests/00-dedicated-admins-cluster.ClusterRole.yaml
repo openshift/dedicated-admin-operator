@@ -142,6 +142,8 @@ rules:
   - services
   verbs:
   - list
+  - get
+  - watch
 - apiGroups:
   - project.openshift.io
   resources:
