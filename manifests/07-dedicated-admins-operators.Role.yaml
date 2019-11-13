@@ -11,3 +11,11 @@ rules:
   - clusterserviceversions
   verbs:
   - "*"
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - list
+  - get
+  - watch
