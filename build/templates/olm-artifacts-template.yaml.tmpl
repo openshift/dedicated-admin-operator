@@ -360,6 +360,18 @@ objects:
         - podmonitors
         verbs:
         - '*'
+      - apiGroups:
+        - kafka.strimzi.io
+        resources:
+        - '*'
+        verbs:
+        - create
+        - delete
+        - get
+        - list
+        - patch
+        - update
+        - watch
     - apiVersion: v1
       kind: Namespace
       metadata:
