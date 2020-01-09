@@ -234,3 +234,11 @@ rules:
   - get
   - watch
 ### END
+### BEGIN - customer can access openshift haproxy router metrics
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routers/metrics
+  verbs:
+  - get
+### END - customer can access openshift haproxy router metrics
