@@ -11,7 +11,7 @@ spec:
     rules:
     - record: DedicatedAdminDesiredBlackList:count
       expr: |
-        count(kube_namespace_created{namespace =~ "^(kube|openshift)-.*"}) + 
+        count(kube_namespace_created{namespace =~ "^(kube|openshift|redhat)-.*"}) + 
         count(kube_namespace_created{namespace =~ "^(logging|default|openshift|ops-health-monitoring|ops-project-operation-check|management-infra)$"})
     - alert: DedicatedAdminBlackListMismatch5Min
       expr: "dedicated_admin_blacklisted_projects != DedicatedAdminDesiredBlackList:count"

@@ -573,7 +573,7 @@ objects:
         - name: sre-dedicated-admin-alerts
           rules:
           - record: DedicatedAdminDesiredBlackList:count
-            expr: "count(kube_namespace_created{namespace =~ \"^(kube|openshift)-.*\"\
+            expr: "count(kube_namespace_created{namespace =~ \"^(kube|openshift|redhat)-.*\"\
               }) + \ncount(kube_namespace_created{namespace =~ \"^(logging|default|openshift|ops-health-monitoring|ops-project-operation-check|management-infra)$\"\
               })\n"
           - alert: DedicatedAdminBlackListMismatch5Min
