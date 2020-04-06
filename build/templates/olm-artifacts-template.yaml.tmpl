@@ -13,7 +13,7 @@ parameters:
 metadata:
   name: selectorsyncset-template
 objects:
-- apiVersion: hive.openshift.io/v1alpha1
+- apiVersion: hive.openshift.io/v1
   kind: SelectorSyncSet
   metadata:
     labels:
@@ -25,7 +25,7 @@ objects:
     clusterDeploymentSelector:
       matchLabels:
         api.openshift.com/managed: 'true'
-    resourceApplyMode: sync
+    resourceApplyMode: Sync
     resources:
     - apiVersion: v1
       kind: Namespace
