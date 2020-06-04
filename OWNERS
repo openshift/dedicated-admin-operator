@@ -1,17 +1,8 @@
-approvers:
-- drewandersonnz
-- c-e-brumm
-- jharrington22
-- rogbas
-- jewzaam
-- mwoodson
-- wanghaoran1988
-- dofinn
 reviewers:
-- aweiteka
 - jewzaam
-- mwoodson
-- lisa
 - rogbas
-- cblecker
-- dofinn
+approvers:
+- jewzaam
+- rogbas
+maintainers:
+- rogbas
