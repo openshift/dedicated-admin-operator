@@ -1,8 +1,20 @@
 reviewers:
 - jewzaam
 - rogbas
+- bmeng
+- mrbarge
+- ravitri
+- anjoshi24
+- a7vicky
+- T0MASD
+
 approvers:
 - jewzaam
 - rogbas
+- mrbarge
+- bmeng
+- ravitri
+
 maintainers:
+- mrbarge
 - rogbas
